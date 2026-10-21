@@ -1,0 +1,25 @@
+# --- Segreti: non devono MAI finire su GitHub ---
+.env
+
+# --- Ambiente virtuale Python (si ricrea con requirements.txt) ---
+.venv/
+venv/
+
+# --- File generati automaticamente da Python ---
+__pycache__/
+*.pyc
+
+# --- Database locale di sviluppo (SQLite) ---
+*.db
+*.sqlite3
+
+# --- Cache dei test ---
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Impostazioni personali dell'editor e del sistema ---
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
