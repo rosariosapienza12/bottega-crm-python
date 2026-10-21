@@ -1,6 +1,6 @@
 """Connessione al database e sessioni SQLAlchemy."""
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import settings
@@ -14,6 +14,16 @@ if settings.database_url.startswith("sqlite"):
 
 # L'engine è il "collegamento" al database: se ne crea uno solo per tutta l'app
 engine = create_engine(settings.database_url, connect_args=connect_args)
+
+if settings.database_url.startswith("sqlite"):
+
+    @event.listens_for(engine, "connect")
+    def enable_sqlite_foreign_keys(dbapi_connection, connection_record):
+        """SQLite non controlla le chiavi esterne se non glielo chiediamo:
+        questa funzione viene eseguita a ogni nuova connessione."""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 # Fabbrica di sessioni: ogni richiesta HTTP avrà la sua sessione
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
