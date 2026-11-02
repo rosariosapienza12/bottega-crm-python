@@ -8,10 +8,10 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.dates import parse_day, parse_start
 from app.deps import CurrentUser, DbSession
 from app.models import Appointment, Customer, User, Visit
 from app.money import parse_euro
-from app.routes.customers import parse_start
 from app.templating import templates
 
 router = APIRouter()
@@ -75,7 +75,7 @@ def render_agenda(
 @router.get("/agenda")
 def agenda(request: Request, db: DbSession, user: CurrentUser, settimana: str = ""):
     try:
-        monday = monday_of(date.fromisoformat(settimana))
+        monday = monday_of(parse_day(settimana))
     except ValueError:
         monday = monday_of(date.today())
     return render_agenda(request, db, user, monday)
@@ -102,7 +102,7 @@ def add_appointment_from_agenda(
         starts_at = parse_start(day, hour)
     except ValueError:
         return render_agenda(
-            request, db, user, monday_of(date.today()), "Scegli giorno e ora.", 400
+            request, db, user, monday_of(date.today()), "Scegli giorno e ora.", 422
         )
     db.add(Appointment(customer=customer, starts_at=starts_at, service=service.strip()[:100] or None))
     db.commit()
@@ -136,8 +136,8 @@ def appointment_done(
         cents = parse_euro(amount)
     except ValueError:
         # Il campo ha già un "pattern" che lo blocca nel browser: qui arriva solo
-        # chi aggira il form, e htmx con un 422 lascia la riga com'è
-        return Response("Importo non valido", status_code=422)
+        # chi aggira il form. Con un 400 htmx non tocca la riga (vedi base.html)
+        return Response("Importo non valido", status_code=400)
     db.add(
         Visit(
             customer_id=appointment.customer_id,

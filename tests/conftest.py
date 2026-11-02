@@ -14,6 +14,7 @@ from sqlalchemy.pool import StaticPool  # noqa: E402
 from app.database import get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Base  # noqa: E402
+from app.ratelimit import ip_limiter, login_limiter, signup_limiter  # noqa: E402
 
 PASSWORD = "una-password-lunga"
 
@@ -55,6 +56,14 @@ def client(engine):
     with TestClient(app) as client:
         yield client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def reset_limiters():
+    # I limitatori vivono in memoria per tutto il processo: ogni test riparte da zero
+    for limiter in (login_limiter, ip_limiter, signup_limiter):
+        limiter.reset_all()
+    yield
 
 
 def register(client, business_name="Salone Anna", email="anna@example.com"):

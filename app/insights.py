@@ -84,17 +84,3 @@ def customer_loyalty(customer: Customer, today: date) -> int:
     since = today - timedelta(days=365)
     recent = [visit for visit in customer.visits if visit.visited_on >= since]
     return loyalty_score(len(recent), sum(visit.amount_cents for visit in recent))
-
-
-def month_totals(db: Session, business_id: int, today: date) -> tuple[int, int]:
-    """Numero di visite e incasso (in centesimi) del mese in corso."""
-    query = (
-        select(func.count(Visit.id), func.coalesce(func.sum(Visit.amount_cents), 0))
-        .join(Visit.customer)
-        .where(
-            Customer.business_id == business_id,
-            Visit.visited_on >= today.replace(day=1),
-        )
-    )
-    count, cents = db.execute(query).one()
-    return count, cents

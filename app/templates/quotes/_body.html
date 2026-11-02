@@ -1,0 +1,77 @@
+<div id="quote-body" class="grid items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+  <section class="panel">
+    <h2>Voci</h2>
+    {% if error %}<p class="alert mt-3" role="alert">{{ error }}</p>{% endif %}
+
+    {% if quote.lines %}
+      <div class="overflow-x-auto">
+        <table class="table mt-2">
+          <thead>
+            <tr><th>Descrizione</th><th class="num">Q.tà</th><th class="num">Prezzo</th><th class="num">Costo</th><th class="num">Totale</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for line in quote.lines %}
+              <tr>
+                <td>{{ line.description }}</td>
+                <td class="num">{{ line.quantity|quantita }}</td>
+                <td class="num">{{ line.unit_price_cents|euro }}</td>
+                <td class="num muted">{{ line.unit_cost_cents|euro if line.unit_cost_cents else "" }}</td>
+                <td class="num">{{ line.total_cents|euro }}</td>
+                <td class="num">
+                  <button class="link link-danger text-sm"
+                          hx-post="/preventivi/{{ quote.id }}/righe/{{ line.id }}/elimina"
+                          hx-target="#quote-body" hx-swap="outerHTML">togli</button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted mt-2">Aggiungi la prima voce: un servizio, un prodotto, delle ore di lavoro.</p>
+    {% endif %}
+
+    <form class="mt-4 grid items-end gap-3 sm:grid-cols-[1fr_5rem_6.5rem_6.5rem_auto]"
+          hx-post="/preventivi/{{ quote.id }}/righe" hx-target="#quote-body" hx-swap="outerHTML">
+      <div>
+        <label for="l-desc">Descrizione</label>
+        <input id="l-desc" name="description" maxlength="200" placeholder="Es. colore e piega" required>
+      </div>
+      <div>
+        <label for="l-qty">Q.tà</label>
+        <input id="l-qty" name="quantity" inputmode="decimal" value="1">
+      </div>
+      <div>
+        <label for="l-price">Prezzo €</label>
+        <input id="l-price" name="price" inputmode="decimal" placeholder="0,00" required>
+      </div>
+      <div>
+        <label for="l-cost">Costo tuo €</label>
+        <input id="l-cost" name="cost" inputmode="decimal" placeholder="0,00">
+      </div>
+      <button class="btn">Aggiungi</button>
+    </form>
+    <p class="hint mt-2">Il costo è quanto spendi tu (prodotti, ore pagate): non compare nella versione per il cliente.</p>
+  </section>
+
+  <aside class="receipt" aria-label="Riepilogo del preventivo">
+    <dl>
+      <dt>Subtotale</dt><dd>{{ totals.subtotal_cents|euro }}</dd>
+      {% if totals.discount_cents %}
+        <dt>Sconto {{ quote.discount_percent }}%</dt><dd>-{{ totals.discount_cents|euro }}</dd>
+      {% endif %}
+      <dt>Imponibile</dt><dd>{{ totals.taxable_cents|euro }}</dd>
+      <dt>IVA {{ quote.vat_percent }}%</dt><dd>{{ totals.vat_cents|euro }}</dd>
+      <dt class="total">Totale</dt><dd class="total">{{ totals.total_cents|euro }}</dd>
+    </dl>
+    <div class="margin">
+      {% if totals.margin_percent is none %}
+        <span class="muted">Il margine compare quando aggiungi una voce.</span>
+      {% else %}
+        Ti restano <b class="{{ 'down' if totals.margin_cents < 0 else 'up' }}">{{ totals.margin_cents|euro }}</b>
+        ({{ totals.margin_percent }}% dell'imponibile), tolti i costi di {{ totals.cost_cents|euro }}.
+        {% if totals.margin_cents < 0 %}<br><b class="down">Con questo prezzo lavori in perdita.</b>{% endif %}
+      {% endif %}
+    </div>
+  </aside>
+</div>

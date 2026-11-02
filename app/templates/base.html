@@ -4,34 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Bottega{% endblock %}</title>
+  {# htmx: i 422 (dati del form sbagliati) si mostrano, gli altri errori no.
+     historyCacheSize 0: niente copie delle pagine in localStorage, che dopo
+     il logout resterebbero leggibili da chi usa lo stesso computer. #}
+  <meta name="htmx-config" content='{"historyCacheSize": 0, "responseHandling": [{"code": "204", "swap": false}, {"code": "[23]..", "swap": true}, {"code": "422", "swap": true}, {"code": "[45]..", "swap": false, "error": true}]}'>
+  <script src="/static/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/static/style.css">
-  <!-- CDN solo per lo sviluppo, in produzione Tailwind va compilato -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+  <!-- integrity: se il file sul CDN venisse alterato, il browser non lo esegue.
+       Tailwind dal CDN va bene in sviluppo, in produzione va compilato. -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"
+          integrity="sha384-A1XhMANHciQ8ED89Ap5K0zOdmQKiEeXSjaN0sakNxIzq9Z2YfXV/BwHp7oP3z5ip" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"
+          integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous" defer></script>
+  <script src="/static/app.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap flex flex-wrap items-center gap-x-6 gap-y-1 py-3">
-      {% if user %}
-        {% set path = request.url.path %}
-        <a href="/panoramica" class="shop">{{ user.business.name }}</a>
-        <nav class="flex gap-5">
-          <a href="/panoramica" {% if path == "/panoramica" %}aria-current="page"{% endif %}>Panoramica</a>
-          <a href="/agenda" {% if path == "/agenda" %}aria-current="page"{% endif %}>Agenda</a>
-          <a href="/clienti" {% if path.startswith("/clienti") %}aria-current="page"{% endif %}>Clienti</a>
-        </nav>
-        <form method="post" action="/esci" class="ml-auto">
-          <button class="link text-sm">Esci</button>
-        </form>
-      {% else %}
-        <a href="/" class="shop">Bottega</a>
-        <a href="/accedi" class="ml-auto text-sm">Accedi</a>
-      {% endif %}
-    </div>
-  </header>
-
-  <main class="wrap py-8">
-    {% block content %}{% endblock %}
+{% if user %}
+  {% set path = request.url.path %}
+  {% macro nav_link(href, label, icon) %}
+    <a href="{{ href }}" {% if path == href or path.startswith(href ~ "/") %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icon|safe }}</svg>
+      {{ label }}
+    </a>
+  {% endmacro %}
+  <div class="app">
+    <aside class="side">
+      <div class="shop">{{ user.business.name }}<small>{{ user.email }}</small></div>
+      <nav aria-label="Sezioni">
+        {{ nav_link("/panoramica", "Panoramica", '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>') }}
+        {{ nav_link("/agenda", "Agenda", '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>') }}
+        {{ nav_link("/clienti", "Clienti", '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/>') }}
+        {{ nav_link("/richieste", "Richieste", '<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/>') }}
+        {{ nav_link("/preventivi", "Preventivi", '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/>') }}
+        {{ nav_link("/cassa", "Cassa", '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/>') }}
+        {{ nav_link("/magazzino", "Magazzino", '<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>') }}
+      </nav>
+      <div class="foot">
+        <button type="button" data-theme-toggle>Tema scuro</button>
+        <form method="post" action="/esci"><button>Esci</button></form>
+      </div>
+    </aside>
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+{% else %}
+  <main class="content public">
+    <p class="mb-10"><a href="/" class="brand">Bottega</a></p>
+    {% block public %}{% endblock %}
   </main>
+{% endif %}
 </body>
 </html>

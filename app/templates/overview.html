@@ -1,84 +1,160 @@
 {% extends "base.html" %}
+{% from "_chart.html" import cash_chart %}
 
-{% block title %}Panoramica · Bottega{% endblock %}
+{% block title %}Panoramica - Bottega{% endblock %}
 
 {% block content %}
-  <h1>Panoramica</h1>
-  <p class="muted">{{ today|data }}</p>
+  <div class="page-head">
+    <div>
+      <h1>Panoramica</h1>
+      <p>{{ today|data_lunga }}</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-ghost" href="/clienti/nuovo">Nuovo cliente</a>
+      <a class="btn" href="/agenda">Apri l'agenda</a>
+    </div>
+  </div>
 
-  <p class="stats mt-4">
-    <span><b>{{ customer_count }}</b> {{ "cliente" if customer_count == 1 else "clienti" }}</span>
-    <span><b>{{ visits_this_month }}</b> {{ "visita" if visits_this_month == 1 else "visite" }} questo mese</span>
-    <span><b>{{ cents_this_month|euro }}</b> incassati questo mese</span>
-  </p>
+  <section class="strip" aria-label="Numeri del mese">
+    <div>
+      <div class="label">Incassato a {{ this_month.name.split()[0] }}</div>
+      <div class="value money">{{ this_month.income_cents|euro }}</div>
+      <div class="note">
+        {% if income_change is none %}primo mese con incassi
+        {% elif income_change >= 0 %}<span class="up">+{{ income_change }}%</span> sul mese scorso
+        {% else %}<span class="down">{{ income_change }}%</span> sul mese scorso{% endif %}
+      </div>
+    </div>
+    <div>
+      <div class="label">Speso a {{ this_month.name.split()[0] }}</div>
+      <div class="value">{{ this_month.expense_cents|euro }}</div>
+      <div class="note">resta {{ this_month.balance_cents|euro }}</div>
+    </div>
+    <div>
+      <div class="label">Richieste aperte</div>
+      <div class="value">{{ open_count }}</div>
+      <div class="note">valgono {{ open_cents|euro }}</div>
+    </div>
+    <div>
+      <div class="label">Da riordinare</div>
+      <div class="value {{ 'down' if to_reorder }}">{{ to_reorder|length }}</div>
+      <div class="note">{{ "prodotti sotto scorta" if to_reorder|length != 1 else "prodotto sotto scorta" }}</div>
+    </div>
+  </section>
+
+  <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Incassi e spese</h2>
+        <div class="legend"><span><i class="in"></i>incassi</span><span><i class="out"></i>spese</span></div>
+      </div>
+      {{ cash_chart(months) }}
+      <p class="text-sm muted mt-1">Gli incassi sono le visite più le entrate segnate in <a href="/cassa">Cassa</a>.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Oggi</h2><a href="/agenda">Agenda</a></div>
+      {% if appointments_today %}
+        <div class="overflow-x-auto">
+          <table class="table appt">
+            <tbody>
+              {% for appointment in appointments_today %}
+                {% with show_customer=True, show_date=False %}{% include "_appointment_row.html" %}{% endwith %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">Nessun appuntamento oggi.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="mt-5 grid gap-5 lg:grid-cols-2">
+    <section class="panel">
+      <div class="panel-head"><h2>Da ricontattare</h2><span class="text-sm muted">fermi da più di {{ dormant_days }} giorni</span></div>
+      {% if dormant %}
+        <table class="table">
+          <tbody>
+            {% for customer, last_visit in dormant[:6] %}
+              <tr>
+                <td><a href="/clienti/{{ customer.id }}">{{ customer.full_name }}</a><br>
+                  <span class="text-sm muted">ultima visita {{ last_visit|giorni_fa }}</span></td>
+                <td class="num">
+                  <a class="wa" target="_blank" rel="noopener noreferrer"
+                     href="{{ whatsapp_link(customer.phone, comeback_text(customer.first_name, user.business.name)) }}">Scrivi su WhatsApp</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">Tutti i clienti sono passati di recente.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Richieste da seguire</h2><a href="/richieste">Pipeline</a></div>
+      {% if hot_requests %}
+        <table class="table">
+          <tbody>
+            {% for item in hot_requests %}
+              <tr>
+                <td><a href="/richieste/{{ item.id }}">{{ item.title }}</a><br>
+                  <span class="text-sm muted">{{ item.who }}</span></td>
+                <td class="num">{{ item.value_cents|euro }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">Nessuna richiesta aperta. <a href="/richieste">Aggiungine una</a></p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Compleanni</h2><span class="text-sm muted">nei prossimi {{ birthday_days }} giorni</span></div>
+      {% if birthdays %}
+        <table class="table">
+          <tbody>
+            {% for customer, birthday in birthdays %}
+              <tr>
+                <td><a href="/clienti/{{ customer.id }}">{{ customer.full_name }}</a><br>
+                  <span class="text-sm muted">{{ birthday|data_breve }}, {{ birthday|tra_giorni }} (compie {{ birthday.year - customer.birth_date.year }} anni)</span></td>
+                <td class="num">
+                  <a class="wa" target="_blank" rel="noopener noreferrer"
+                     href="{{ whatsapp_link(customer.phone, birthday_text(customer.first_name, user.business.name)) }}">Fai gli auguri</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">Nessun compleanno in arrivo.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Da riordinare</h2><a href="/magazzino">Magazzino</a></div>
+      {% if to_reorder %}
+        <table class="table">
+          <tbody>
+            {% for product in to_reorder[:6] %}
+              <tr>
+                <td>{{ product.name }}</td>
+                <td class="num"><span class="tag {{ 'tag-bad' if product.quantity == 0 else 'tag-warn' }}">
+                  {{ "finito" if product.quantity == 0 else "ne restano " ~ product.quantity ~ " " ~ product.unit }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">Scorte a posto.</p>
+      {% endif %}
+    </section>
+  </div>
 
   {% if customer_count == 0 %}
-    <p class="mt-6">Non hai ancora clienti. <a href="/clienti/nuovo">Aggiungi il primo</a>.</p>
-  {% endif %}
-
-  <h2>Oggi</h2>
-  {% if appointments_today %}
-    <div class="overflow-x-auto">
-      <table class="table appt mt-2">
-        <tbody>
-          {% for appointment in appointments_today %}
-            {% with show_customer=True, show_date=False %}{% include "_appointment_row.html" %}{% endwith %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <p class="mt-1">Nessun appuntamento. <a href="/agenda">Apri l'agenda</a></p>
-  {% endif %}
-
-  <h2>Da ricontattare</h2>
-  <p class="muted text-sm">Clienti che non passano da più di {{ dormant_days }} giorni.</p>
-  {% if dormant %}
-    <div class="overflow-x-auto">
-      <table class="table mt-2">
-        <thead><tr><th>Cliente</th><th>Ultima visita</th><th></th></tr></thead>
-        <tbody>
-          {% for customer, last_visit in dormant %}
-            <tr>
-              <td><a href="/clienti/{{ customer.id }}">{{ customer.full_name }}</a></td>
-              <td>{{ last_visit|data }} <span class="muted">· {{ last_visit|giorni_fa }}</span></td>
-              <td class="num">
-                <a class="wa" target="_blank" rel="noopener"
-                   href="{{ whatsapp_link(customer.phone, comeback_text(customer.first_name, user.business.name)) }}">Scrivi su WhatsApp</a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <p class="mt-2">Nessuno da ricontattare.</p>
-  {% endif %}
-
-  <h2>Compleanni</h2>
-  <p class="muted text-sm">Nei prossimi {{ birthday_days }} giorni.</p>
-  {% if birthdays %}
-    <div class="overflow-x-auto">
-      <table class="table mt-2">
-        <thead><tr><th>Cliente</th><th>Quando</th><th></th></tr></thead>
-        <tbody>
-          {% for customer, birthday in birthdays %}
-            <tr>
-              <td><a href="/clienti/{{ customer.id }}">{{ customer.full_name }}</a></td>
-              <td>
-                {{ birthday|data_breve }} <span class="muted">· {{ birthday|tra_giorni }},
-                compie {{ birthday.year - customer.birth_date.year }} anni</span>
-              </td>
-              <td class="num">
-                <a class="wa" target="_blank" rel="noopener"
-                   href="{{ whatsapp_link(customer.phone, birthday_text(customer.first_name, user.business.name)) }}">Fai gli auguri</a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <p class="mt-2">Nessun compleanno in arrivo.</p>
+    <p class="mt-6 panel">Per iniziare <a href="/clienti/nuovo">aggiungi il primo cliente</a>, poi fissa un appuntamento dall'agenda.</p>
   {% endif %}
 {% endblock %}

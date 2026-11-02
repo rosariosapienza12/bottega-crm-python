@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 
-{% block content %}
-  <h1>Gestione clienti per piccole attività</h1>
-  <p class="mt-3 max-w-prose">
-    Schede clienti, visite e spese per parrucchieri, estetisti, palestre e negozi.
-    Nella Panoramica vedi chi non passa da più di due mesi e chi compie gli anni,
-    con il messaggio WhatsApp già scritto da mandare.
-  </p>
-  <p class="mt-6 flex flex-wrap gap-3">
-    <a class="btn" href="/registrati">Crea un account</a>
-    <a class="btn btn-plain" href="/accedi">Accedi</a>
-  </p>
+{% block public %}
+  <div class="grid items-start gap-10 md:grid-cols-[1.1fr_1fr]">
+    <div>
+      <h1 class="hero">Il quaderno dei clienti, ma che ti avvisa lui.</h1>
+      <p class="mt-4 max-w-prose text-lg muted">
+        Per parrucchieri, estetisti, palestre e negozi. Bottega tiene clienti,
+        appuntamenti, preventivi, cassa e magazzino nello stesso posto, e ogni
+        mattina ti dice chi non passa da un po' e chi compie gli anni.
+      </p>
+      <p class="mt-7 flex flex-wrap gap-3">
+        <a class="btn" href="/registrati">Registra la tua attività</a>
+        <a class="btn btn-ghost" href="/accedi">Accedi</a>
+      </p>
+    </div>
+
+    {# Un'anteprima di come appare una mattina in Panoramica: dati di esempio #}
+    <figure class="panel m-0" aria-label="Esempio della Panoramica">
+      <p class="muted text-sm">Martedì mattina, Salone Anna</p>
+      <ul class="preview">
+        <li><b>9:30</b> Chiara Conti, piega</li>
+        <li><b>11:00</b> Luca Bianchi, taglio uomo</li>
+        <li class="warn">Maria Rossi non passa da 95 giorni <span class="wa">Scrivi su WhatsApp</span></li>
+        <li class="warn">Tinta castano 5.0: ne restano 2</li>
+        <li>Compleanno di Francesca venerdì <span class="wa">Fai gli auguri</span></li>
+      </ul>
+    </figure>
+  </div>
 {% endblock %}

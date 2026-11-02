@@ -1,0 +1,5 @@
+<section class="strip strip-3" aria-label="Riepilogo magazzino">
+  <div><div class="label">Prodotti</div><div class="value">{{ count }}</div></div>
+  <div><div class="label">Da riordinare</div><div class="value {{ 'down' if to_reorder }}">{{ to_reorder }}</div></div>
+  <div><div class="label">Valore in magazzino</div><div class="value money">{{ stock_value|euro }}</div><div class="note">al costo d'acquisto</div></div>
+</section>

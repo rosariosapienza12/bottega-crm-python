@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Registrati · Bottega{% endblock %}
+{% block title %}Registrati - Bottega{% endblock %}
 
-{% block content %}
-  <div class="max-w-sm">
+{% block public %}
+  <div class="panel max-w-sm">
     <h1>Registra la tua attività</h1>
-    <p class="muted mt-1">Ogni attività vede solo i propri clienti.</p>
+    <p class="muted mt-2">Ogni attività vede solo i propri clienti.</p>
 
-    {% if error %}<p class="alert mt-4">{{ error }}</p>{% endif %}
+    {% if error %}<p class="alert mt-4" role="alert">{{ error }}</p>{% endif %}
 
     <form method="post" action="/registrati" class="mt-5">
       <div class="field">
@@ -20,7 +20,7 @@
       </div>
       <div class="field">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required>
+        <input id="password" name="password" type="password" minlength="8" maxlength="200" autocomplete="new-password" required>
         <p class="hint">Almeno 8 caratteri.</p>
       </div>
       <button class="btn">Crea l'account</button>

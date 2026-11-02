@@ -92,7 +92,8 @@ def test_done_with_bad_amount_changes_nothing(logged_in, db):
 
     response = logged_in.post(f"/appuntamenti/{appointment_id}/fatto", data={"amount": "tanti"})
 
-    assert response.status_code == 422
+    # 400 e non 422: htmx non deve toccare la riga (con 422 la cancellerebbe)
+    assert response.status_code == 400
     assert db.scalars(select(Appointment)).first() is not None
     assert db.scalars(select(Visit)).first() is None
 

@@ -7,7 +7,7 @@
     <span><b>{{ visits|length }}</b> {{ "visita" if visits|length == 1 else "visite" }}</span>
     <span><b>{{ visits|sum(attribute="amount_cents")|euro }}</b> spesi</span>
     {% if visits %}<span>ultima {{ visits[0].visited_on|giorni_fa }}</span>{% endif %}
-    <span>fedeltà <b>{{ score }}</b> <span class="muted">· {{ score|fedelta }}</span></span>
+    <span>fedeltà <b>{{ score }}</b> <span class="muted">({{ score|fedelta }})</span></span>
   </p>
 
   <form class="mt-4 grid items-end gap-3 sm:grid-cols-[10rem_8rem_1fr_auto]"

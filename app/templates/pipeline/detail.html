@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }} - Bottega{% endblock %}
+
+{% block content %}
+  <a class="back" href="/richieste">Torna alle richieste</a>
+  <div class="page-head">
+    <div>
+      <h1>{{ item.title }}</h1>
+      <p>Arrivata {{ item.created_at.date()|giorni_fa }}{% if item.who %}, da {{ item.who }}{% endif %}</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <form method="post" action="/richieste/{{ item.id }}/preventivo">
+        <button class="btn">{{ "Apri il preventivo" if item.quotes else "Prepara il preventivo" }}</button>
+      </form>
+      {% if item.customer %}
+        <a class="btn btn-ghost" href="/clienti/{{ item.customer.id }}">Scheda cliente</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+    <form class="panel" method="post" action="/richieste/{{ item.id }}">
+      {% if error %}<p class="alert mb-4" role="alert">{{ error }}</p>{% endif %}
+      <div class="field">
+        <label for="title">Cosa chiede</label>
+        <input id="title" name="title" value="{{ item.title }}" maxlength="150" required>
+      </div>
+      <div class="grid gap-x-4 sm:grid-cols-2">
+        <div class="field">
+          <label for="customer_id">Cliente</label>
+          <select id="customer_id" name="customer_id">
+            <option value="">Non è ancora cliente</option>
+            {% for c in customers %}
+              <option value="{{ c.id }}" {% if c.id == item.customer_id %}selected{% endif %}>{{ c.last_name }} {{ c.first_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="contact_name">Oppure il nome</label>
+          <input id="contact_name" name="contact_name" value="{{ item.contact_name or '' }}" maxlength="100">
+        </div>
+        <div class="field">
+          <label for="value">Valore €</label>
+          <input id="value" name="value" inputmode="decimal" value="{{ item.value_cents|importo }}"
+                 {% if item.quotes %}readonly aria-describedby="value-hint"{% endif %}>
+          {% if item.quotes %}<p class="hint" id="value-hint">Viene dal preventivo: cambialo lì.</p>{% endif %}
+        </div>
+        <div class="field">
+          <label for="stage">Fase</label>
+          <select id="stage" name="stage">
+            {% for key, label in stages %}
+              <option value="{{ key }}" {% if key == item.stage %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="notes">Note</label>
+        <textarea id="notes" name="notes" rows="5" maxlength="5000">{{ item.notes or "" }}</textarea>
+      </div>
+      <button class="btn">Salva</button>
+    </form>
+
+    <div class="flex flex-col gap-5">
+      <section class="panel">
+        <h2>Preventivi</h2>
+        {% if item.quotes %}
+          <ul class="mt-2">
+            {% for quote in item.quotes %}
+              <li><a href="/preventivi/{{ quote.id }}">{{ quote.title }}</a> <span class="muted text-sm">del {{ quote.created_at|data }}</span></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted mt-2">Ancora nessuno.</p>
+        {% endif %}
+      </section>
+
+      <form class="panel" method="post" action="/richieste/{{ item.id }}/elimina"
+            hx-post="/richieste/{{ item.id }}/elimina" hx-confirm="Eliminare la richiesta? I preventivi restano.">
+        <h2>Elimina</h2>
+        <p class="muted mt-1 text-sm">I preventivi collegati non vengono cancellati.</p>
+        <button class="btn btn-danger btn-small mt-3">Elimina la richiesta</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

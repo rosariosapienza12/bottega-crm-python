@@ -42,7 +42,7 @@ def test_parse_euro(raw, cents):
     assert parse_euro(raw) == cents
 
 
-@pytest.mark.parametrize("raw", ["dieci", "-5", "1,234", "NaN", "Infinity"])
+@pytest.mark.parametrize("raw", ["dieci", "-5", "1,234", "NaN", "Infinity", "1e9999", "10000000,01"])
 def test_parse_euro_rejects_bad_values(raw):
     with pytest.raises(ValueError):
         parse_euro(raw)
@@ -63,3 +63,22 @@ def test_loyalty_score():
     assert loyalty_label(40) == "abituale"
     assert loyalty_label(5) == "occasionale"
     assert loyalty_label(0) == "nuovo"
+
+
+@pytest.mark.parametrize("raw, cents", [("1.250", 125_000), ("12.345.678", None), ("1.25", 125), ("12.50", 1250)])
+def test_italian_thousands_without_comma(raw, cents):
+    # "1.250" scritto da un italiano sono mille e duecentocinquanta euro, non 1,25
+    if cents is None:
+        with pytest.raises(ValueError):
+            parse_euro(raw)  # 12 milioni: oltre il tetto
+    else:
+        assert parse_euro(raw) == cents
+
+
+def test_limiter_forgets_keys_and_does_not_grow():
+    from app.ratelimit import AttemptLimiter
+
+    limiter = AttemptLimiter(max_attempts=2, window=60)
+    for i in range(1000):
+        limiter.is_blocked(f"email:{i}@example.com")
+    assert limiter._attempts == {}

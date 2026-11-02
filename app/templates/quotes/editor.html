@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quote.title }} - Bottega{% endblock %}
+
+{% block content %}
+  <a class="back" href="{{ '/richieste/%d' % quote.request_id if quote.request_id else '/preventivi' }}">
+    {{ "Torna alla richiesta" if quote.request_id else "Tutti i preventivi" }}</a>
+  <div class="page-head">
+    <h1>{{ quote.title }}</h1>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn" href="/preventivi/{{ quote.id }}/stampa" target="_blank" rel="noopener">Versione per il cliente</a>
+      <form method="post" action="/preventivi/{{ quote.id }}/elimina"
+            hx-post="/preventivi/{{ quote.id }}/elimina" hx-confirm="Eliminare il preventivo?">
+        <button class="btn btn-danger">Elimina</button>
+      </form>
+    </div>
+  </div>
+
+  {# Ogni modifica qui manda il form e aggiorna righe e scontrino #}
+  <form class="panel grid items-end gap-3 md:grid-cols-[2fr_1.4fr_6rem_6rem] mb-5"
+        hx-post="/preventivi/{{ quote.id }}/intestazione" hx-trigger="change" hx-target="#quote-body" hx-swap="outerHTML">
+    <div>
+      <label for="q-title">Titolo</label>
+      <input id="q-title" name="title" value="{{ quote.title }}" maxlength="150" required>
+    </div>
+    <div>
+      <label for="q-customer">Cliente</label>
+      <select id="q-customer" name="customer_id">
+        <option value="">Nessuno</option>
+        {% for c in customers %}
+          <option value="{{ c.id }}" {% if c.id == quote.customer_id %}selected{% endif %}>{{ c.last_name }} {{ c.first_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="q-discount">Sconto %</label>
+      <input id="q-discount" name="discount_percent" inputmode="numeric" value="{{ quote.discount_percent }}">
+    </div>
+    <div>
+      <label for="q-vat">IVA %</label>
+      <input id="q-vat" name="vat_percent" inputmode="numeric" value="{{ quote.vat_percent }}">
+    </div>
+  </form>
+
+  {% include "quotes/_body.html" %}
+{% endblock %}

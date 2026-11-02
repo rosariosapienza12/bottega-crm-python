@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ "Modifica cliente" if customer else "Nuovo cliente" }} · Bottega{% endblock %}
+{% block title %}{{ "Modifica cliente" if customer else "Nuovo cliente" }} - Bottega{% endblock %}
 
 {% block content %}
   {% if customer %}
-    <p class="text-sm"><a href="/clienti/{{ customer.id }}">&larr; {{ customer.full_name }}</a></p>
-    <h1 class="mt-2">Modifica cliente</h1>
+    <a class="back" href="/clienti/{{ customer.id }}">Torna a {{ customer.full_name }}</a>
+    <div class="page-head"><h1>Modifica cliente</h1></div>
   {% else %}
-    <p class="text-sm"><a href="/clienti">&larr; Clienti</a></p>
-    <h1 class="mt-2">Nuovo cliente</h1>
+    <a class="back" href="/clienti">Tutti i clienti</a>
+    <div class="page-head"><h1>Nuovo cliente</h1></div>
   {% endif %}
 
   {% if errors %}<p class="alert mt-4">Controlla i campi segnati qui sotto.</p>{% endif %}

@@ -1,0 +1,62 @@
+{# Form per la nuova richiesta + colonne. htmx sostituisce tutto il blocco #board. #}
+<div id="board">
+  <details class="panel mb-5" {% if error %}open{% endif %}>
+    <summary class="cursor-pointer font-semibold">Nuova richiesta</summary>
+    <form class="mt-4 grid items-end gap-3 md:grid-cols-[2fr_1.3fr_1.2fr_8rem_auto]"
+          hx-post="/richieste" hx-target="#board" hx-swap="outerHTML">
+      <div>
+        <label for="r-title">Cosa chiede</label>
+        <input id="r-title" name="title" maxlength="150" placeholder="Es. trucco e acconciatura sposa" required>
+      </div>
+      <div>
+        <label for="r-customer">Cliente</label>
+        <select id="r-customer" name="customer_id">
+          <option value="">Non è ancora cliente</option>
+          {% for c in customers %}<option value="{{ c.id }}">{{ c.last_name }} {{ c.first_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="r-contact">Oppure il nome</label>
+        <input id="r-contact" name="contact_name" maxlength="100" placeholder="Es. Sara (Instagram)">
+      </div>
+      <div>
+        <label for="r-value">Valore €</label>
+        <input id="r-value" name="value" inputmode="decimal" placeholder="0,00">
+      </div>
+      <button class="btn">Aggiungi</button>
+    </form>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  </details>
+
+  <div class="board">
+    {% for column in columns %}
+      <section class="column" data-stage="{{ column.key }}" aria-label="{{ column.label }}">
+        <header>
+          <h2>{{ column.label }} <span class="count">{{ column.cards|length }}</span></h2>
+          {% if column.total %}<span class="total">{{ column.total|euro }}</span>{% endif %}
+        </header>
+        <div class="cards">
+          {% for card in column.cards %}
+            <article class="card stage-{{ card.stage }}" draggable="true" data-id="{{ card.id }}">
+              <a class="title" href="/richieste/{{ card.id }}">{{ card.title }}</a>
+              <div class="meta">
+                <span>{{ card.who }}</span>
+                {% if card.value_cents %}<span class="value">{{ card.value_cents|euro }}</span>{% endif %}
+              </div>
+              <div class="meta"><span>{{ card.created_at.date()|giorni_fa }}</span>
+                {% if card.quotes %}<a href="/preventivi/{{ card.quotes[-1].id }}">preventivo</a>{% endif %}</div>
+              {# Alternativa al trascinamento: telefono e tastiera #}
+              <label class="sr-only" for="stage-{{ card.id }}">Sposta in</label>
+              <select id="stage-{{ card.id }}" name="stage"
+                      hx-post="/richieste/{{ card.id }}/sposta" hx-target="#board" hx-swap="outerHTML">
+                {% for key, label in stages %}
+                  <option value="{{ key }}" {% if key == card.stage %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+</div>

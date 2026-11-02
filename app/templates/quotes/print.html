@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preventivo {{ quote.id }} - {{ user.business.name }}</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/static/print.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="shop">{{ user.business.name }}</p>
+      <p>{{ user.email }}</p>
+    </div>
+    <div class="right">
+      <p><b>Preventivo n. {{ quote.id }}</b></p>
+      <p>del {{ quote.created_at|data }}</p>
+    </div>
+  </header>
+
+  {% set who = quote.customer.full_name if quote.customer else (quote.request.who if quote.request else "") %}
+  {% if who %}<p class="to">Per {{ who }}</p>{% endif %}
+  <h1>{{ quote.title }}</h1>
+
+  <table>
+    <thead><tr><th>Descrizione</th><th class="n">Q.tà</th><th class="n">Prezzo</th><th class="n">Importo</th></tr></thead>
+    <tbody>
+      {% for line in quote.lines %}
+        <tr>
+          <td>{{ line.description }}</td>
+          <td class="n">{{ line.quantity|quantita }}</td>
+          <td class="n">{{ line.unit_price_cents|euro }}</td>
+          <td class="n">{{ line.total_cents|euro }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <dl>
+    <dt>Subtotale</dt><dd>{{ totals.subtotal_cents|euro }}</dd>
+    {% if totals.discount_cents %}<dt>Sconto {{ quote.discount_percent }}%</dt><dd>-{{ totals.discount_cents|euro }}</dd>{% endif %}
+    <dt>Imponibile</dt><dd>{{ totals.taxable_cents|euro }}</dd>
+    <dt>IVA {{ quote.vat_percent }}%</dt><dd>{{ totals.vat_cents|euro }}</dd>
+    <dt class="total">Totale</dt><dd class="total">{{ totals.total_cents|euro }}</dd>
+  </dl>
+
+  <p class="foot">Preventivo valido 30 giorni dalla data di emissione.</p>
+</body>
+</html>

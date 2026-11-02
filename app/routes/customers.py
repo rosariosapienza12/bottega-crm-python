@@ -1,6 +1,6 @@
 """Schede clienti e visite."""
 
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 from typing import Annotated, NamedTuple
 
 from email_validator import EmailNotValidError, validate_email
@@ -10,9 +10,11 @@ from pydantic import BaseModel
 from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session
 
+from app.dates import parse_day, parse_start
 from app.deps import CurrentUser, DbSession
 from app.insights import customer_loyalty, loyalty_score
-from app.models import Appointment, Customer, User, Visit
+from app.models import Appointment, Customer, Quote, User, Visit
+from app.models import Request as PipelineRequest
 from app.money import parse_euro
 from app.phone import normalize_phone
 from app.templating import templates
@@ -64,7 +66,7 @@ def clean_customer_form(form: CustomerForm) -> tuple[dict, dict]:
             errors["email"] = "Email non valida."
     if form.birth_date.strip():
         try:
-            values["birth_date"] = date.fromisoformat(form.birth_date.strip())
+            values["birth_date"] = parse_day(form.birth_date)
         except ValueError:
             errors["birth_date"] = "Data non valida."
         else:
@@ -116,8 +118,9 @@ def find_customers(db: Session, business_id: int, q: str, sort: str) -> list[Cus
         .where(Customer.business_id == business_id)
         .group_by(Customer.id)
     )
-    # Ogni parola cercata deve comparire nel nome, nel cognome o nel telefono
-    for word in q.split():
+    # Ogni parola cercata deve comparire nel nome, nel cognome o nel telefono.
+    # Limitate: ogni parola aggiunge una condizione alla query.
+    for word in q[:100].split()[:5]:
         pattern = f"%{word}%"
         query = query.where(
             or_(
@@ -268,7 +271,14 @@ def update_customer(
 
 @router.post("/{customer_id}/elimina")
 def delete_customer(request: Request, db: DbSession, user: CurrentUser, customer_id: int):
-    db.delete(get_customer(db, user, customer_id))
+    customer = get_customer(db, user, customer_id)
+    # Richieste e preventivi restano: perdono il collegamento ma tengono il nome
+    for item in db.scalars(select(PipelineRequest).where(PipelineRequest.customer_id == customer.id)):
+        item.contact_name = customer.full_name
+        item.customer_id = None
+    for quote in db.scalars(select(Quote).where(Quote.customer_id == customer.id)):
+        quote.customer_id = None
+    db.delete(customer)
     db.commit()
     if is_htmx(request):
         return Response(headers={"HX-Redirect": "/clienti"})
@@ -304,7 +314,7 @@ def add_visit(
 ):
     customer = get_customer(db, user, customer_id)
     try:
-        day = date.fromisoformat(visited_on)
+        day = parse_day(visited_on)
     except ValueError:
         return visits_section(request, customer, "Data non valida.")
     if day > date.today():
@@ -339,11 +349,6 @@ def delete_visit(
 def appointments_section(request: Request, customer: Customer, error: str | None = None):
     context = {"customer": customer, "now": datetime.now(), "appointment_error": error}
     return templates.TemplateResponse(request, "customers/_appointments.html", context)
-
-
-def parse_start(day: str, hour: str) -> datetime:
-    """Data e ora dei campi del form -> datetime. Solleva ValueError se non validi."""
-    return datetime.combine(date.fromisoformat(day), time.fromisoformat(hour))
 
 
 @router.post("/{customer_id}/appuntamenti")

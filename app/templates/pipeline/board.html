@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Richieste - Bottega{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Richieste</h1>
+      <p>Trascina una scheda nella colonna giusta quando la richiesta va avanti.</p>
+    </div>
+  </div>
+
+  {% include "pipeline/_board.html" %}
+{% endblock %}

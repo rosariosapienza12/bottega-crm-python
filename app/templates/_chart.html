@@ -1,0 +1,29 @@
+{# Grafico a barre incassi/spese, disegnato dal server: niente librerie JavaScript.
+   `months` è una lista di MonthCash, dal più vecchio al mese in corso. #}
+{% macro cash_chart(months) %}
+  {% set width, height, top, bottom = 640, 230, 14, 34 %}
+  {% set top_value = [months|map(attribute="income_cents")|max, months|map(attribute="expense_cents")|max, 1]|max %}
+  {% set slot = (width - 20) / months|length %}
+  {% set bar = slot * 0.3 %}
+  {% set usable = height - top - bottom %}
+  <svg class="chart" viewBox="0 0 {{ width }} {{ height }}" role="img"
+       aria-label="Incassi e spese degli ultimi {{ months|length }} mesi">
+    {% for step in [0, 0.5, 1] %}
+      <line class="grid" x1="10" x2="{{ width - 10 }}" y1="{{ top + usable * step }}" y2="{{ top + usable * step }}"/>
+    {% endfor %}
+    {% for m in months %}
+      {% set x = 10 + slot * loop.index0 + slot / 2 %}
+      {% set h_in = usable * m.income_cents / top_value %}
+      {% set h_out = usable * m.expense_cents / top_value %}
+      <g class="{{ 'now' if loop.last }}">
+        <rect class="in" x="{{ x - bar - 2 }}" y="{{ top + usable - h_in }}" width="{{ bar }}" height="{{ h_in }}" rx="2">
+          <title>Incassi di {{ m.name }}: {{ m.income_cents|euro }}</title>
+        </rect>
+        <rect class="out" x="{{ x + 2 }}" y="{{ top + usable - h_out }}" width="{{ bar }}" height="{{ h_out }}" rx="2">
+          <title>Spese di {{ m.name }}: {{ m.expense_cents|euro }}</title>
+        </rect>
+        <text class="month" x="{{ x }}" y="{{ height - 12 }}" text-anchor="middle">{{ m.short_name }}</text>
+      </g>
+    {% endfor %}
+  </svg>
+{% endmacro %}

@@ -22,7 +22,7 @@ def test_register_rejects_short_password(client):
     )
 
     assert response.status_code == 400
-    assert "almeno 8 caratteri" in response.text
+    assert "da 8 a 200 caratteri" in response.text
 
 
 def test_register_rejects_email_already_used(client):

@@ -20,6 +20,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     # Hash Argon2, la password in chiaro non si salva mai
     password_hash: Mapped[str] = mapped_column(String(255))
+    # Finisce nel cookie al login. "Esci" lo incrementa: così un cookie copiato
+    # prima del logout non vale più, anche se la firma è ancora buona.
+    session_version: Mapped[int] = mapped_column(default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     business: Mapped["Business"] = relationship(back_populates="users")

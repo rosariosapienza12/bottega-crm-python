@@ -26,9 +26,10 @@ def test_month_totals(logged_in):
     logged_in.post(f"{url}/visite", data={"visited_on": date.today().isoformat(), "amount": "25,50"})
 
     page = logged_in.get("/panoramica").text
+    strip = page.split('aria-label="Numeri del mese"')[1].split("</section>")[0]
 
-    assert "<b>1</b> visita questo mese" in page
-    assert "25,50 €" in page
+    # L'incasso del mese è nella striscia in alto, colorato come "soldi"
+    assert '<div class="value money">25,50 €</div>' in strip
 
 
 def test_upcoming_birthday_is_listed(logged_in):

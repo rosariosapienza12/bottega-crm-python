@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Clienti · Bottega{% endblock %}
+{% block title %}Clienti - Bottega{% endblock %}
 
 {% block content %}
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <h1>Clienti</h1>
+  <div class="page-head">
+    <div>
+      <h1>Clienti</h1>
+      <p>Clicca sul nome di una colonna per ordinare.</p>
+    </div>
     <a class="btn" href="/clienti/nuovo">Nuovo cliente</a>
   </div>
 
-  <form action="/clienti" method="get" class="mt-5 max-w-md" role="search"
+  <form action="/clienti" method="get" class="max-w-md" role="search"
         hx-get="/clienti" hx-trigger="input changed delay:250ms from:#q, search from:#q"
         hx-target="#tabella" hx-swap="outerHTML" hx-push-url="true">
     <label for="q" class="sr-only">Cerca</label>

@@ -1,23 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Agenda · Bottega{% endblock %}
+{% block title %}Agenda - Bottega{% endblock %}
 
 {% block content %}
   <div id="agenda">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h1>Agenda</h1>
+    <div class="page-head">
+      <div>
+        <h1>Agenda</h1>
+        <p>{{ monday|data_breve }} – {{ sunday|data_breve }} {{ sunday.year }}</p>
+      </div>
       {# hx-boost: i link cambiano solo #agenda, senza ricaricare la pagina #}
       <nav class="flex items-center gap-4 text-sm" aria-label="Settimane"
            hx-boost="true" hx-target="#agenda" hx-select="#agenda" hx-swap="outerHTML">
-        <a href="/agenda?settimana={{ previous.isoformat() }}">&larr; precedente</a>
-        {% if monday != this_monday %}<a href="/agenda">questa settimana</a>{% endif %}
-        <a href="/agenda?settimana={{ next.isoformat() }}">successiva &rarr;</a>
+        <a href="/agenda?settimana={{ previous.isoformat() }}">Settimana prima</a>
+        {% if monday != this_monday %}<a href="/agenda">Questa settimana</a>{% endif %}
+        <a href="/agenda?settimana={{ next.isoformat() }}">Settimana dopo</a>
       </nav>
     </div>
-    <p class="muted">{{ monday|data_breve }} – {{ sunday|data_breve }} {{ sunday.year }}</p>
 
     {% if customers %}
-      <form class="mt-5 grid items-end gap-3 sm:grid-cols-[1fr_9.5rem_6rem_1fr_auto]"
+      <form class="panel grid items-end gap-3 sm:grid-cols-[1fr_9.5rem_6rem_1fr_auto]"
             hx-post="/agenda" hx-target="#agenda" hx-select="#agenda" hx-swap="outerHTML">
         <div>
           <label for="customer_id">Cliente</label>
@@ -37,30 +39,32 @@
           <label for="service">Servizio</label>
           <input id="service" name="service" maxlength="100" placeholder="Es. colore">
         </div>
-        <button class="btn">Aggiungi</button>
+        <button class="btn">Fissa</button>
       </form>
-      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
     {% else %}
-      <p class="mt-5">Per prendere appuntamenti serve almeno un cliente. <a href="/clienti/nuovo">Aggiungilo qui</a>.</p>
+      <p class="panel">Per prendere appuntamenti serve almeno un cliente. <a href="/clienti/nuovo">Aggiungilo qui</a>.</p>
     {% endif %}
 
-    {% for day in days %}
-      <h2>
-        {{ day.name }} {{ day.date|data_breve }}{% if day.date == today %} <span class="muted font-normal">· oggi</span>{% endif %}
-      </h2>
-      {% if day.appointments %}
-        <div class="overflow-x-auto">
-          <table class="table appt">
-            <tbody>
-              {% for appointment in day.appointments %}
-                {% with show_customer=True, show_date=False %}{% include "_appointment_row.html" %}{% endwith %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <p class="muted text-sm">Niente in agenda.</p>
-      {% endif %}
-    {% endfor %}
+    <div class="week mt-5">
+      {% for day in days %}
+        <section class="day {{ 'is-today' if day.date == today }} {{ 'is-empty' if not day.appointments }}">
+          <h2>{{ day.name }} <span>{{ day.date|data_breve }}</span></h2>
+          {% if day.appointments %}
+            <div class="overflow-x-auto">
+              <table class="table appt">
+                <tbody>
+                  {% for appointment in day.appointments %}
+                    {% with show_customer=True, show_date=False %}{% include "_appointment_row.html" %}{% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="muted text-sm">Libero.</p>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}

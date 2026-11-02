@@ -1,0 +1,49 @@
+{% if editing %}
+  <tr>
+    <td colspan="6">
+      <form class="grid items-end gap-3 md:grid-cols-[2fr_5rem_6rem_7rem_7rem_auto_auto]"
+            hx-post="/magazzino/{{ product.id }}" hx-target="closest tr" hx-swap="outerHTML">
+        <div><label for="e-name-{{ product.id }}">Prodotto</label>
+          <input id="e-name-{{ product.id }}" name="name" value="{{ product.name }}" maxlength="100" required></div>
+        <div><label for="e-unit-{{ product.id }}">Unità</label>
+          <input id="e-unit-{{ product.id }}" name="unit" value="{{ product.unit }}" maxlength="20"></div>
+        <div><label for="e-qty-{{ product.id }}">Quantità</label>
+          <input id="e-qty-{{ product.id }}" name="quantity" value="{{ product.quantity }}" inputmode="numeric"></div>
+        <div><label for="e-min-{{ product.id }}">Scorta min.</label>
+          <input id="e-min-{{ product.id }}" name="min_quantity" value="{{ product.min_quantity }}" inputmode="numeric"></div>
+        <div><label for="e-cost-{{ product.id }}">Costo €</label>
+          <input id="e-cost-{{ product.id }}" name="cost" value="{{ product.unit_cost_cents|importo }}" inputmode="decimal"></div>
+        <button class="btn btn-small">Salva</button>
+        <button type="button" class="link text-sm" hx-get="/magazzino/{{ product.id }}" hx-target="closest tr" hx-swap="outerHTML">annulla</button>
+      </form>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    </td>
+  </tr>
+{% else %}
+  <tr>
+    <td>
+      {{ product.name }}
+      {% if product.quantity == 0 %}<span class="tag tag-bad">finito</span>
+      {% elif product.to_reorder %}<span class="tag tag-warn">da riordinare</span>{% endif %}
+    </td>
+    <td class="whitespace-nowrap">
+      <span class="stepper">
+        <button class="btn btn-ghost btn-small" aria-label="Uno in meno: {{ product.name }}"
+                hx-post="/magazzino/{{ product.id }}/quantita" hx-vals='{"delta": -1}'
+                hx-target="closest tr" hx-swap="outerHTML" {% if product.quantity == 0 %}disabled{% endif %}>−</button>
+        <b>{{ product.quantity }}</b> {{ product.unit }}
+        <button class="btn btn-ghost btn-small" aria-label="Uno in più: {{ product.name }}"
+                hx-post="/magazzino/{{ product.id }}/quantita" hx-vals='{"delta": 1}'
+                hx-target="closest tr" hx-swap="outerHTML">+</button>
+      </span>
+    </td>
+    <td class="num">{{ product.min_quantity }}</td>
+    <td class="num">{{ product.unit_cost_cents|euro }}</td>
+    <td class="num">{{ (product.quantity * product.unit_cost_cents)|euro }}</td>
+    <td class="num">
+      <button class="link text-sm" hx-get="/magazzino/{{ product.id }}/modifica" hx-target="closest tr" hx-swap="outerHTML">modifica</button>
+      <button class="link link-danger text-sm ml-2" hx-post="/magazzino/{{ product.id }}/elimina"
+              hx-target="closest tr" hx-swap="delete" hx-confirm="Togliere {{ product.name }} dal magazzino?">elimina</button>
+    </td>
+  </tr>
+{% endif %}

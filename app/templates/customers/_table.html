@@ -8,8 +8,8 @@
   {% endif %}
 {% endmacro %}
 
-<div id="tabella" class="overflow-x-auto">
-  <table class="table mt-4">
+<div id="tabella" class="panel overflow-x-auto mt-4">
+  <table class="table">
     <thead>
       <tr>
         <th>{{ sort_link("nome", "Cliente") }}</th>
@@ -24,7 +24,7 @@
           <td><a href="/clienti/{{ row.customer.id }}">{{ row.customer.last_name }} {{ row.customer.first_name }}</a></td>
           <td class="whitespace-nowrap">{{ row.customer.phone|telefono }}</td>
           <td>{% if row.last_visit %}{{ row.last_visit|data }}{% else %}<span class="muted">mai</span>{% endif %}</td>
-          <td class="whitespace-nowrap">{{ row.score }} <span class="muted">· {{ row.score|fedelta }}</span></td>
+          <td class="whitespace-nowrap">{{ row.score }} <span class="muted">({{ row.score|fedelta }})</span></td>
         </tr>
       {% else %}
         <tr>

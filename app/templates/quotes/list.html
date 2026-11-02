@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Preventivi - Bottega{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Preventivi</h1>
+      <p>Prezzo, sconto, IVA e quanto ti resta in tasca.</p>
+    </div>
+    <form method="post" action="/preventivi"><button class="btn">Nuovo preventivo</button></form>
+  </div>
+
+  <div class="panel overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr><th>Preventivo</th><th>Cliente</th><th>Data</th><th class="num">Totale</th><th class="num">Margine</th></tr>
+      </thead>
+      <tbody>
+        {% for quote, totals in rows %}
+          <tr>
+            <td><a href="/preventivi/{{ quote.id }}">{{ quote.title }}</a></td>
+            <td>{{ quote.customer.full_name if quote.customer else (quote.request.who if quote.request else "") }}</td>
+            <td>{{ quote.created_at|data }}</td>
+            <td class="num">{{ totals.total_cents|euro }}</td>
+            <td class="num {{ 'down' if totals.margin_cents < 0 }}">
+              {% if totals.margin_percent is not none %}{{ totals.margin_percent }}%{% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted">Nessun preventivo. Puoi crearne uno da qui o da una richiesta in pipeline.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
