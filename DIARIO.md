@@ -38,3 +38,21 @@ Cosa ho imparato:
 - La differenza tra percorso relativo e assoluto, e perché conta per SQLite.
 - Cos'è una fixture di pytest.
 - Cosa fa `cascade="all, delete-orphan"` in una relationship.
+
+Nel pomeriggio: l'app diventa usabile.
+
+- Registrazione e login, password con Argon2, sessione in un cookie firmato.
+- Schede clienti con ricerca dal vivo e ordinamento, visite con importo,
+  note modificabili sul posto, pulsante WhatsApp.
+- Agenda settimanale: un appuntamento passato si segna come "fatto" con
+  l'incasso e diventa una visita.
+- Panoramica con appuntamenti di oggi, clienti da ricontattare e compleanni.
+- Punteggio fedeltà.
+- Header di sicurezza e test che provano a leggere i clienti di un'altra
+  attività. 68 test in tutto.
+
+Cosa ho imparato:
+- Come funziona htmx: il server risponde con un pezzo di HTML, non con JSON.
+- Perché i soldi non si salvano con i float.
+- Cos'è un attacco CSRF e cosa fa `SameSite=Lax`.
+- Cos'è un IDOR: cambiare un id nell'indirizzo per vedere dati di altri.
