@@ -56,3 +56,27 @@ Cosa ho imparato:
 - Perché i soldi non si salvano con i float.
 - Cos'è un attacco CSRF e cosa fa `SameSite=Lax`.
 - Cos'è un IDOR: cambiare un id nell'indirizzo per vedere dati di altri.
+
+In serata: le funzioni del gestionale completo.
+
+- Pipeline delle richieste con trascinamento tra colonne (e menu a tendina
+  per telefono e tastiera).
+- Preventivatore: righe con costo, sconto, IVA, margine, versione da stampare.
+- Cassa con grafico degli ultimi sei mesi e spese per categoria.
+- Magazzino con pulsanti - e +, scorta minima, avvisi in Panoramica.
+- Nuova grafica: barra laterale, tema chiaro e scuro, font Bricolage
+  Grotesque e Figtree.
+- Sicurezza: limite ai login e alle registrazioni, logout che invalida i
+  cookie copiati, controllo dell'origine dei POST, SRI sugli script del CDN.
+- Test di penetrazione con curl e due revisioni automatiche (codice e
+  sicurezza). Hanno trovato errori veri: "1.250" letto come 1,25 euro, un
+  importo enorme che mandava il server in errore, date tipo 9999 che
+  rompevano la cassa, errori dei form che htmx non mostrava. Corretti, con un
+  test per ognuno. 134 test in tutto.
+- Controllato tutto da telefono: niente esce dallo schermo o si sovrappone.
+
+Cosa ho imparato:
+- Cos'è un N+1 e come si risolve con joinedload / selectinload.
+- Perché l'arrotondamento "al pari" di Python non va bene per i soldi.
+- Cos'è una race condition, e perché il +1 del magazzino lo fa il database.
+- Che min-width: 0 sugli elementi di una griglia evita che la pagina sbordi.

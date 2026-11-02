@@ -11,7 +11,7 @@ Bottega is a learning project, built step by step.
 ## What it does
 
 - **Accounts per business.** Each owner registers their business and only
-  ever sees their own customers, visits and appointments.
+  ever sees their own data.
 - **Customers.** Records with phone, email, birthday and notes. The list has
   live search and can be sorted by name, last visit or loyalty.
 - **Visits.** Date, amount and what was done, added without reloading the page.
@@ -22,6 +22,18 @@ Bottega is a learning project, built step by step.
   WhatsApp message (wa.me link).
 - **Loyalty score** from 0 to 100, based on visits and spending in the last
   year.
+- **Requests pipeline.** A board with columns (new, contacted, quote sent,
+  confirmed, lost). Cards are dragged between columns; on a phone there is a
+  menu on each card instead.
+- **Quotes.** Lines with quantity, price and your own cost, discount and VAT.
+  The total and your margin update as you type, and there is a clean
+  printable version for the customer without costs or margin.
+- **Cash book.** Visits count as income automatically; other income and
+  expenses are added by hand. Monthly totals, a six-month chart drawn on the
+  server, and where the money goes by category.
+- **Stock.** Quantities with - / + buttons, minimum stock and a reorder list
+  on the overview.
+- Light and dark theme, works on a phone.
 
 The interface is in Italian, since that's who it's for.
 
@@ -54,7 +66,15 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Then open <http://127.0.0.1:8000> and register a business.
+Then open <http://127.0.0.1:8000> and register a business, or load a demo
+business with sample data:
+
+```powershell
+python -m scripts.crea_demo
+```
+
+The demo password is in `scripts/crea_demo.py`; it only exists in your local
+database.
 
 To run the tests:
 
@@ -65,6 +85,18 @@ pytest
 The tests use an in-memory database and a fake configuration, so they never
 touch your `.env` or `bottega.db`.
 
+## Security
+
+- Passwords hashed with Argon2; login blocked after 5 wrong attempts.
+- Signed session cookie (HttpOnly, SameSite=Lax); logging out also
+  invalidates copies of the cookie.
+- Every query is filtered by the logged-in business; tests try to read and
+  change another business's data and expect 404.
+- CSRF: SameSite cookie plus an Origin/Referer check on every POST.
+- Strict Content-Security-Policy (no inline scripts), subresource integrity
+  on CDN scripts, `X-Frame-Options`, `no-store` on private pages.
+- Secrets only in `.env`, never committed; `SECRET_KEY` is a `SecretStr`.
+
 ## Project structure
 
 ```
@@ -73,13 +105,19 @@ app/
   config.py       settings loaded from .env
   database.py     engine and sessions
   deps.py         shared dependencies (db session, logged-in user)
-  routes/         auth, overview, customers, agenda
-  models/         Business, User, Customer, Visit, Appointment
+  routes/         auth, overview, customers, agenda, pipeline, quotes, cash, inventory
+  models/         Business, User, Customer, Visit, Appointment,
+                  Request, Quote, QuoteLine, Movement, Product
   insights.py     dormant customers, birthdays, loyalty score
+  quotes.py       quote totals, rounding, margin
+  cash.py         monthly income and expenses
+  ratelimit.py    limits on logins and sign-ups
+  dates.py        date parsing with sane year limits
   money.py        euro amounts stored as integer cents
   phone.py        phone numbers and WhatsApp links
   templates/      Jinja2 templates (files starting with _ are HTMX fragments)
-  static/         stylesheet
+  static/         stylesheets and a little JS (theme, drag and drop)
 alembic/          database migrations
-tests/            pytest tests
+scripts/          crea_demo.py: demo business with sample data
+tests/            pytest tests, including "attacker" tests
 ```

@@ -9,11 +9,25 @@ provare l'app sul proprio PC: non usarle su un'app messa online.
 """
 
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 
 from sqlalchemy import select
 
+from app.cash import add_months
 from app.database import SessionLocal
-from app.models import Appointment, Business, Customer, User, Visit
+from app.models import (
+    Appointment,
+    Business,
+    Customer,
+    Movement,
+    Product,
+    Quote,
+    QuoteLine,
+    Request,
+    User,
+    Visit,
+)
+from app.quotes import compute_totals
 from app.security import hash_password
 
 DEMO_EMAIL = "demo@bottega.test"
@@ -44,6 +58,34 @@ APPOINTMENTS = [
 ]
 
 
+# (titolo, cliente o None, nome se non è cliente, valore in euro, fase)
+REQUESTS = [
+    ("Trucco e acconciatura sposa", None, "Sara (Instagram)", 280, "nuova"),
+    ("Colore per la comunione della figlia", "Francesca", None, 60, "contattata"),
+    ("Pacchetto 5 pieghe", "Giulia", None, 120, "preventivo"),
+    ("Trattamento cheratina", None, "Elena (passaparola)", 150, "nuova"),
+    ("Taglio e barba per il matrimonio", "Luca", None, 45, "confermata"),
+    ("Extension", None, "Marta", 400, "persa"),
+]
+
+# (descrizione, quantità, prezzo €, costo €) per il preventivo della sposa
+QUOTE_LINES = [
+    ("Prova trucco e acconciatura", "1", 80, 10),
+    ("Trucco sposa il giorno del matrimonio", "1", 120, 15),
+    ("Acconciatura sposa", "1", 100, 8),
+    ("Uscita a domicilio (ore)", "1.5", 30, 12),
+]
+
+# (nome, quantità, scorta minima, costo €)
+PRODUCTS = [
+    ("Tinta castano 5.0", 2, 3, 7.5),
+    ("Tinta biondo 8.0", 6, 3, 7.5),
+    ("Ossigeno 20 vol", 0, 2, 4.2),
+    ("Shampoo professionale 1 l", 4, 2, 9.9),
+    ("Lacca forte", 9, 4, 5.4),
+]
+
+
 def birthday_in(days: int, born: int = 1990) -> date:
     target = date.today() + timedelta(days=days)
     return date(born, target.month, min(target.day, 28))
@@ -51,13 +93,81 @@ def birthday_in(days: int, born: int = 1990) -> date:
 
 def main() -> None:
     db = SessionLocal()
-    if db.scalar(select(User).where(User.email == DEMO_EMAIL)):
-        print(f"L'attività di prova esiste già. Accedi con {DEMO_EMAIL}.")
-        return
+    user = db.scalar(select(User).where(User.email == DEMO_EMAIL))
+    if user is None:
+        business = Business(name="Salone Anna (prova)")
+        db.add(User(email=DEMO_EMAIL, password_hash=hash_password(DEMO_PASSWORD), business=business))
+    else:
+        business = user.business
 
-    business = Business(name="Salone Anna (prova)")
-    db.add(User(email=DEMO_EMAIL, password_hash=hash_password(DEMO_PASSWORD), business=business))
+    # Ogni parte si aggiunge solo se manca: lo script si può rilanciare
+    if not business.customers:
+        add_customers_and_appointments(db, business)
+    if not business.requests:
+        add_requests_and_quote(db, business)
+    if not business.movements:
+        add_movements(db, business)
+    if not business.products:
+        for name, quantity, minimum, cost in PRODUCTS:
+            business.products.append(
+                Product(
+                    name=name, quantity=quantity,
+                    min_quantity=minimum, unit_cost_cents=round(cost * 100),
+                )
+            )
 
+    db.commit()
+    print(f"Fatto. Accedi con {DEMO_EMAIL} (la password è in scripts/crea_demo.py).")
+
+
+def add_requests_and_quote(db, business) -> None:
+    customers = {c.first_name: c for c in business.customers}
+    for position, (title, first, contact, euro, stage) in enumerate(REQUESTS, start=1):
+        business.requests.append(
+            Request(
+                title=title, customer=customers.get(first),
+                contact_name=contact, value_cents=euro * 100, stage=stage, position=position,
+            )
+        )
+    db.flush()
+    bride = next(r for r in business.requests if r.title.startswith("Trucco e acconciatura"))
+    quote = Quote(request=bride, title=bride.title, discount_percent=5)
+    for description, quantity, price, cost in QUOTE_LINES:
+        quote.lines.append(
+            QuoteLine(
+                description=description, quantity=Decimal(quantity),
+                unit_price_cents=price * 100, unit_cost_cents=cost * 100,
+            )
+        )
+    business.quotes.append(quote)
+    db.flush()  # i valori predefiniti (IVA 22%) arrivano col salvataggio
+    bride.value_cents = compute_totals(quote.lines, quote.discount_percent, quote.vat_percent).total_cents
+
+
+def add_movements(db, business) -> None:
+    this_month = date.today().replace(day=1)
+    for months_back in range(6):
+        start = add_months(this_month, -months_back)
+        expenses = [(1, 650, "Affitto"), (8, 180 + 15 * months_back, "Prodotti"), (15, 95, "Bollette")]
+        for day, euro, category in expenses:
+            occurred = start.replace(day=day)
+            if occurred <= date.today():
+                business.movements.append(
+                    Movement(
+                        kind="uscita", occurred_on=occurred,
+                        amount_cents=euro * 100, category=category,
+                    )
+                )
+        if months_back % 2 == 0:
+            business.movements.append(
+                Movement(
+                    kind="entrata", occurred_on=start,
+                    amount_cents=240_00, category="Vendita prodotti",
+                )
+            )
+
+
+def add_customers_and_appointments(db, business) -> None:
     by_name = {}
     for first, last, phone, birthday_days, notes, visits in CUSTOMERS:
         customer = Customer(
@@ -86,9 +196,7 @@ def main() -> None:
                 customer=by_name[first], starts_at=now + timedelta(hours=hours), service=service
             )
         )
-
-    db.commit()
-    print(f"Fatto. Accedi con {DEMO_EMAIL} (la password è in scripts/crea_demo.py).")
+    db.flush()
 
 
 if __name__ == "__main__":

@@ -64,9 +64,14 @@ inviati da altri siti (CSRF). In produzione va messo `SESSION_HTTPS_ONLY=true`.
 Alternativa scartata: JWT. Per un sito con pagine generate dal server non
 serve, e un cookie di sessione è più semplice da spiegare e da gestire.
 
-Limiti che conosco: il cookie resta valido fino alla scadenza (14 giorni)
-anche dopo il logout, se qualcuno l'ha copiato; non c'è un limite ai
-tentativi di login. Da sistemare prima di andare online.
+Il logout incrementa session_version dell'utente: un cookie copiato prima
+del logout non vale più. Dopo 5 password sbagliate per la stessa email dallo
+stesso IP il login si blocca per 15 minuti. La chiave è la coppia IP + email,
+così uno sconosciuto non può bloccare il tuo account; dopo 20 tentativi da
+uno stesso IP si blocca l'IP. Le registrazioni sono al massimo 10 l'ora per
+IP. Tutto in memoria: con più server servirebbe Redis. Dietro un proxy
+uvicorn va avviato con --proxy-headers, altrimenti tutti avrebbero l'IP del
+proxy.
 
 ## Ogni query filtra per attività
 Ogni cliente, visita e appuntamento si cerca sempre insieme al `business_id`
@@ -101,3 +106,42 @@ centinaio di clienti è veloce e il codice resta leggibile.
 ## Test su un database SQLite in memoria
 Ogni test parte da un database vuoto (`StaticPool`, una sola connessione)
 e una configurazione finta: non tocca `bottega.db` né il `.env`.
+
+## Valore delle richieste: decide il preventivo
+Una richiesta con preventivi vale quanto il più recente, e il campo valore
+nella richiesta diventa di sola lettura. Così i totali della pipeline e della
+Panoramica non vanno mai in disaccordo con i preventivi. "Prepara il
+preventivo" su una richiesta che ne ha già uno apre quello: un doppio clic
+non crea doppioni.
+
+## Arrotondamenti dei soldi
+Una sola funzione, round_half_up: 0,5 centesimi va su, come in negozio. Il
+round() di Python arrotonda "al pari" (2,5 diventa 2): va bene per la
+statistica, non per gli scontrini. Ogni riga del preventivo si arrotonda per
+conto suo, così il subtotale è la somma esatta delle righe stampate.
+
+## Errori dei form con htmx: 422
+htmx di default non mostra le risposte 4xx. In base.html è configurato per
+mostrare i 422 (dati del form sbagliati, con il messaggio) e ignorare gli
+altri errori. Per questo "Fatto" con un importo assurdo risponde 400: htmx
+lascia la riga com'è invece di toglierla.
+
+## Limiti sui dati in ingresso
+Importi fino a 10 milioni di euro, quantità fino a 9999, anni dal 1900 al
+2200, ricerca fino a 5 parole. Il test di penetrazione ha mostrato che senza
+limiti "1e9999" o "9999-12-31" mandavano il server in errore 500.
+
+## Magazzino: il +1 lo fa il database
+Una sola istruzione UPDATE. Leggere la quantità, sommare in Python e
+riscrivere perderebbe un clic se ne arrivano due nello stesso istante
+(race condition).
+
+## Grafici disegnati dal server
+Il grafico incassi/spese è un SVG generato da Jinja: nessuna libreria
+JavaScript da caricare e aggiornare, e funziona anche senza JavaScript.
+
+## Stile
+Verde pino per struttura e azioni, senape per i soldi e le cose da guardare,
+fondo grigio-menta. Bricolage Grotesque per i titoli, Figtree per il testo,
+con numeri incolonnati. Una sola cosa "forte" per pagina (il grafico, la
+pipeline, lo scontrino del preventivo), il resto sobrio.
