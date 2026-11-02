@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Accedi · Bottega{% endblock %}
+
+{% block content %}
+  <div class="max-w-sm">
+    <h1>Accedi</h1>
+
+    {% if error %}<p class="alert mt-4">{{ error }}</p>{% endif %}
+
+    <form method="post" action="/accedi" class="mt-5">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="{{ email or '' }}" autocomplete="email" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn">Accedi</button>
+    </form>
+
+    <p class="mt-6 text-sm muted">Non hai un account? <a href="/registrati">Registra la tua attività</a></p>
+  </div>
+{% endblock %}

@@ -1,0 +1,109 @@
+/* Stili di base di Bottega. Tailwind lo uso per spaziature e layout,
+   qui ci sono colori, testo, tabelle e form. */
+
+:root {
+  --paper: #f6f4ef;
+  --ink: #23211d;
+  --muted: #6d685f;
+  --line: #dcd7cc;
+  --green: #2d5a4a;
+  --green-dark: #22453a;
+  --rust: #a2492b;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+a { color: var(--green); }
+
+h1 { font-size: 1.6rem; font-weight: 700; line-height: 1.2; margin: 0; }
+h2 { font-size: 1.05rem; font-weight: 700; margin: 2.2rem 0 0.2rem; }
+
+.muted { color: var(--muted); }
+
+/* Barra in alto */
+.topbar { background: var(--green); color: #fff; }
+.topbar a, .topbar button { color: #dfeae4; text-decoration: none; }
+.topbar a:hover, .topbar button:hover { color: #fff; }
+.topbar a[aria-current="page"] { color: #fff; text-decoration: underline; text-underline-offset: 5px; }
+.topbar .shop { color: #fff; font-weight: 700; }
+
+/* Tabelle */
+.table { width: 100%; border-collapse: collapse; }
+.table th {
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid var(--line);
+  padding: 0.4rem 0.5rem;
+}
+.table th a { color: inherit; }
+.table th .sorted { color: var(--ink); }
+.table td { border-bottom: 1px solid var(--line); padding: 0.5rem; vertical-align: top; }
+.table tbody tr:hover td { background: #efece4; }
+.table .num { text-align: right; white-space: nowrap; }
+/* Appuntamenti: una tabella per giorno, le colonne devono restare allineate */
+.table.appt { table-layout: fixed; min-width: 34rem; }
+.table.appt td:first-child { width: 7.5rem; }
+.table.appt td:last-child { width: 15rem; }
+
+/* Pulsanti */
+.btn {
+  display: inline-block;
+  background: var(--green);
+  color: #fff;
+  border: 1px solid var(--green);
+  border-radius: 3px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover { background: var(--green-dark); }
+.btn-plain { background: transparent; color: var(--green); }
+.btn-plain:hover { background: #e8eee9; }
+.btn-danger { background: transparent; color: var(--rust); border-color: var(--rust); }
+.btn-danger:hover { background: #f3e6df; }
+.link { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+.link-danger { color: var(--rust); text-decoration: underline; }
+
+/* Form */
+label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+input, textarea, select {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #bdb6a8;
+  border-radius: 3px;
+  padding: 0.4rem 0.55rem;
+}
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+input.amount-input { width: 6.5rem; padding: 0.25rem 0.45rem; }
+input.amount-input:invalid { border-color: var(--rust); }
+.field { margin-bottom: 1rem; }
+.hint { color: var(--muted); font-size: 0.8rem; margin-top: 0.15rem; }
+.error { color: var(--rust); font-size: 0.85rem; margin-top: 0.2rem; }
+.alert { border-left: 3px solid var(--rust); background: #f3e6df; padding: 0.5rem 0.75rem; }
+
+/* Pezzi vari */
+.stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1.5rem; }
+.stats b { font-size: 1.15rem; }
+.notes { white-space: pre-line; background: #fffdf8; border: 1px solid var(--line); padding: 0.6rem 0.8rem; }
+.wa { color: #1d7148; font-weight: 600; white-space: nowrap; }

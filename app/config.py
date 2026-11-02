@@ -1,5 +1,6 @@
 """Impostazioni lette dal file .env."""
 
+import os
 from pathlib import Path
 
 from pydantic import SecretStr, field_validator
@@ -9,12 +10,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env")
+    # I test impostano BOTTEGA_ENV_FILE su un file che non esiste,
+    # così non leggono mai il .env vero
+    model_config = SettingsConfigDict(
+        env_file=os.environ.get("BOTTEGA_ENV_FILE", BASE_DIR / ".env")
+    )
 
     # Nessun default: se mancano nel .env l'app si ferma subito
     database_url: str
     # SecretStr: se finisce in un log o in un errore si vede "**********"
     secret_key: SecretStr
+    # In produzione va messo a true: il cookie di login viaggia solo su HTTPS
+    session_https_only: bool = False
 
     @field_validator("database_url")
     @classmethod

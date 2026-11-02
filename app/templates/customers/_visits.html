@@ -1,0 +1,55 @@
+{# Si ricarica da solo quando un appuntamento viene segnato come fatto #}
+<section id="visite" hx-get="/clienti/{{ customer.id }}/visite"
+         hx-trigger="visitsChanged from:body" hx-swap="outerHTML">
+  <h2>Visite</h2>
+  {% set visits = customer.visits %}
+  <p class="stats text-sm">
+    <span><b>{{ visits|length }}</b> {{ "visita" if visits|length == 1 else "visite" }}</span>
+    <span><b>{{ visits|sum(attribute="amount_cents")|euro }}</b> spesi</span>
+    {% if visits %}<span>ultima {{ visits[0].visited_on|giorni_fa }}</span>{% endif %}
+    <span>fedeltà <b>{{ score }}</b> <span class="muted">· {{ score|fedelta }}</span></span>
+  </p>
+
+  <form class="mt-4 grid items-end gap-3 sm:grid-cols-[10rem_8rem_1fr_auto]"
+        hx-post="/clienti/{{ customer.id }}/visite" hx-target="#visite" hx-swap="outerHTML">
+    <div>
+      <label for="visited_on">Data</label>
+      <input id="visited_on" name="visited_on" type="date" value="{{ today.isoformat() }}" max="{{ today.isoformat() }}" required>
+    </div>
+    <div>
+      <label for="amount">Importo €</label>
+      <input id="amount" name="amount" inputmode="decimal" placeholder="0,00">
+    </div>
+    <div>
+      <label for="note">Cosa ha fatto</label>
+      <input id="note" name="note" maxlength="255" placeholder="Es. taglio e piega">
+    </div>
+    <button class="btn">Aggiungi</button>
+  </form>
+  {% if visit_error %}<p class="error">{{ visit_error }}</p>{% endif %}
+
+  {% if visits %}
+    <div class="overflow-x-auto">
+      <table class="table mt-4">
+        <thead><tr><th>Data</th><th>Cosa</th><th class="num">Importo</th><th></th></tr></thead>
+        <tbody>
+          {% for visit in visits %}
+            <tr>
+              <td class="whitespace-nowrap">{{ visit.visited_on|data }}</td>
+              <td>{{ visit.note or "" }}</td>
+              <td class="num">{{ visit.amount_cents|euro }}</td>
+              <td class="num">
+                <button class="link link-danger text-sm"
+                        hx-post="/clienti/{{ customer.id }}/visite/{{ visit.id }}/elimina"
+                        hx-target="#visite" hx-swap="outerHTML"
+                        hx-confirm="Eliminare la visita del {{ visit.visited_on|data }}?">elimina</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="mt-4 muted">Nessuna visita registrata.</p>
+  {% endif %}
+</section>

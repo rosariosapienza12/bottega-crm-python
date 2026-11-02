@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Modifica cliente" if customer else "Nuovo cliente" }} · Bottega{% endblock %}
+
+{% block content %}
+  {% if customer %}
+    <p class="text-sm"><a href="/clienti/{{ customer.id }}">&larr; {{ customer.full_name }}</a></p>
+    <h1 class="mt-2">Modifica cliente</h1>
+  {% else %}
+    <p class="text-sm"><a href="/clienti">&larr; Clienti</a></p>
+    <h1 class="mt-2">Nuovo cliente</h1>
+  {% endif %}
+
+  {% if errors %}<p class="alert mt-4">Controlla i campi segnati qui sotto.</p>{% endif %}
+
+  <form method="post" action="{{ '/clienti/%d/modifica' % customer.id if customer else '/clienti/nuovo' }}" class="mt-5 max-w-xl">
+    <div class="grid gap-x-4 sm:grid-cols-2">
+      <div class="field">
+        <label for="first_name">Nome</label>
+        <input id="first_name" name="first_name" value="{{ form.first_name }}" maxlength="100" required>
+        {% if errors.first_name %}<p class="error">{{ errors.first_name }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="last_name">Cognome</label>
+        <input id="last_name" name="last_name" value="{{ form.last_name }}" maxlength="100" required>
+        {% if errors.last_name %}<p class="error">{{ errors.last_name }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="phone">Telefono</label>
+        <input id="phone" name="phone" type="tel" value="{{ form.phone }}" required>
+        <p class="hint">Serve per WhatsApp. Senza prefisso si intende +39.</p>
+        {% if errors.phone %}<p class="error">{{ errors.phone }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="email">Email <span class="muted font-normal">(facoltativa)</span></label>
+        <input id="email" name="email" type="email" value="{{ form.email }}" maxlength="255">
+        {% if errors.email %}<p class="error">{{ errors.email }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="birth_date">Data di nascita <span class="muted font-normal">(facoltativa)</span></label>
+        <input id="birth_date" name="birth_date" type="date" value="{{ form.birth_date }}">
+        {% if errors.birth_date %}<p class="error">{{ errors.birth_date }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="field">
+      <label for="notes">Note</label>
+      <textarea id="notes" name="notes" rows="4" placeholder="Allergie, preferenze, cose da ricordare...">{{ form.notes }}</textarea>
+      {% if errors.notes %}<p class="error">{{ errors.notes }}</p>{% endif %}
+    </div>
+    <div class="flex items-center gap-4">
+      <button class="btn">Salva</button>
+      <a href="{{ '/clienti/%d' % customer.id if customer else '/clienti' }}">Annulla</a>
+    </div>
+  </form>
+{% endblock %}

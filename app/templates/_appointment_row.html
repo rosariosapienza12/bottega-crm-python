@@ -1,0 +1,27 @@
+{# Una riga di appuntamento. Usata in agenda, panoramica e scheda cliente. #}
+<tr>
+  <td class="whitespace-nowrap">
+    {% if show_date %}{{ appointment.starts_at|data_breve }}, {% endif %}{{ appointment.starts_at.strftime("%H:%M") }}
+  </td>
+  {% if show_customer %}
+    <td><a href="/clienti/{{ appointment.customer_id }}">{{ appointment.customer.full_name }}</a></td>
+  {% endif %}
+  <td>{{ appointment.service or "" }}</td>
+  <td>
+    <div class="flex flex-wrap items-center justify-end gap-3">
+      {% if appointment.starts_at <= now %}
+        <form class="flex items-center gap-2"
+              hx-post="/appuntamenti/{{ appointment.id }}/fatto"
+              hx-target="closest tr" hx-swap="delete">
+          <input name="amount" inputmode="decimal" class="amount-input" placeholder="incasso €"
+                 aria-label="Incasso" pattern="[0-9]+([.,][0-9]{1,2})?" title="Es. 25 oppure 25,50">
+          <button class="btn btn-plain text-sm">Fatto</button>
+        </form>
+      {% endif %}
+      <button class="link link-danger text-sm"
+              hx-post="/appuntamenti/{{ appointment.id }}/annulla"
+              hx-target="closest tr" hx-swap="delete"
+              hx-confirm="Annullare l'appuntamento?">annulla</button>
+    </div>
+  </td>
+</tr>

@@ -1,0 +1,35 @@
+<section id="appuntamenti">
+  <h2>Appuntamenti</h2>
+
+  <form class="mt-3 grid items-end gap-3 sm:grid-cols-[9.5rem_6rem_1fr_auto]"
+        hx-post="/clienti/{{ customer.id }}/appuntamenti" hx-target="#appuntamenti" hx-swap="outerHTML">
+    <div>
+      <label for="day">Giorno</label>
+      <input id="day" name="day" type="date" required>
+    </div>
+    <div>
+      <label for="hour">Ora</label>
+      <input id="hour" name="hour" type="time" step="900" required>
+    </div>
+    <div>
+      <label for="service">Servizio</label>
+      <input id="service" name="service" maxlength="100" placeholder="Es. colore">
+    </div>
+    <button class="btn">Fissa</button>
+  </form>
+  {% if appointment_error %}<p class="error">{{ appointment_error }}</p>{% endif %}
+
+  {% if customer.appointments %}
+    <div class="overflow-x-auto">
+      <table class="table appt mt-4">
+        <tbody>
+          {% for appointment in customer.appointments %}
+            {% with show_customer=False, show_date=True %}{% include "_appointment_row.html" %}{% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="mt-3 muted">Nessun appuntamento in programma.</p>
+  {% endif %}
+</section>

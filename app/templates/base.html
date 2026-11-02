@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Bottega{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- CDN solo per lo sviluppo, in produzione Tailwind va compilato -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap flex flex-wrap items-center gap-x-6 gap-y-1 py-3">
+      {% if user %}
+        {% set path = request.url.path %}
+        <a href="/panoramica" class="shop">{{ user.business.name }}</a>
+        <nav class="flex gap-5">
+          <a href="/panoramica" {% if path == "/panoramica" %}aria-current="page"{% endif %}>Panoramica</a>
+          <a href="/agenda" {% if path == "/agenda" %}aria-current="page"{% endif %}>Agenda</a>
+          <a href="/clienti" {% if path.startswith("/clienti") %}aria-current="page"{% endif %}>Clienti</a>
+        </nav>
+        <form method="post" action="/esci" class="ml-auto">
+          <button class="link text-sm">Esci</button>
+        </form>
+      {% else %}
+        <a href="/" class="shop">Bottega</a>
+        <a href="/accedi" class="ml-auto text-sm">Accedi</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="wrap py-8">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

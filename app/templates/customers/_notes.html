@@ -1,0 +1,23 @@
+{# Note del cliente: si modificano sul posto, htmx sostituisce solo questo blocco #}
+<div id="note-cliente" class="mt-5">
+  {% if editing %}
+    <form hx-post="/clienti/{{ customer.id }}/note" hx-target="#note-cliente" hx-swap="outerHTML">
+      <label for="notes">Note</label>
+      <textarea id="notes" name="notes" rows="4" autofocus
+                placeholder="Allergie, preferenze, cose da ricordare...">{{ customer.notes or "" }}</textarea>
+      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+      <div class="mt-2 flex items-center gap-4">
+        <button class="btn">Salva</button>
+        <a href="/clienti/{{ customer.id }}"
+           hx-get="/clienti/{{ customer.id }}/note" hx-target="#note-cliente" hx-swap="outerHTML">Annulla</a>
+      </div>
+    </form>
+  {% elif customer.notes %}
+    <div class="notes">{{ customer.notes }}</div>
+    <button class="link text-sm mt-1 underline"
+            hx-get="/clienti/{{ customer.id }}/note/modifica" hx-target="#note-cliente" hx-swap="outerHTML">modifica note</button>
+  {% else %}
+    <button class="link text-sm underline"
+            hx-get="/clienti/{{ customer.id }}/note/modifica" hx-target="#note-cliente" hx-swap="outerHTML">+ aggiungi una nota</button>
+  {% endif %}
+</div>

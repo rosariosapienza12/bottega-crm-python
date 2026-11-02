@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ customer.full_name }} · Bottega{% endblock %}
+
+{% block content %}
+  <p class="text-sm"><a href="/clienti">&larr; Clienti</a></p>
+
+  <div class="mt-2 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1>{{ customer.full_name }}</h1>
+      <p class="muted">
+        {{ customer.phone|telefono }}
+        {% if customer.email %} · <a href="mailto:{{ customer.email }}">{{ customer.email }}</a>{% endif %}
+        {% if customer.birth_date %} · nato/a il {{ customer.birth_date|data }}{% endif %}
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn" target="_blank" rel="noopener" href="{{ whatsapp_link(customer.phone, '') }}">WhatsApp</a>
+      <a class="btn btn-plain" href="/clienti/{{ customer.id }}/modifica">Modifica</a>
+      <form method="post" action="/clienti/{{ customer.id }}/elimina"
+            hx-post="/clienti/{{ customer.id }}/elimina"
+            hx-confirm="Eliminare {{ customer.full_name }}, le sue visite e i suoi appuntamenti? Non si torna indietro.">
+        <button class="btn btn-danger">Elimina</button>
+      </form>
+    </div>
+  </div>
+
+  {% include "customers/_notes.html" %}
+  {% include "customers/_appointments.html" %}
+  {% include "customers/_visits.html" %}
+{% endblock %}

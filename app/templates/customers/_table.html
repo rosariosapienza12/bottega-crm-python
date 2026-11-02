@@ -1,0 +1,46 @@
+{% macro sort_link(key, label) %}
+  {% if sort == key %}
+    <span class="sorted">{{ label }} &darr;</span>
+  {% else %}
+    <a href="/clienti?q={{ q|urlencode }}&ordina={{ key }}"
+       hx-get="/clienti?q={{ q|urlencode }}&ordina={{ key }}"
+       hx-target="#tabella" hx-swap="outerHTML" hx-push-url="true">{{ label }}</a>
+  {% endif %}
+{% endmacro %}
+
+<div id="tabella" class="overflow-x-auto">
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        <th>{{ sort_link("nome", "Cliente") }}</th>
+        <th>Telefono</th>
+        <th>{{ sort_link("ultima", "Ultima visita") }}</th>
+        <th>{{ sort_link("fedelta", "Fedeltà") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td><a href="/clienti/{{ row.customer.id }}">{{ row.customer.last_name }} {{ row.customer.first_name }}</a></td>
+          <td class="whitespace-nowrap">{{ row.customer.phone|telefono }}</td>
+          <td>{% if row.last_visit %}{{ row.last_visit|data }}{% else %}<span class="muted">mai</span>{% endif %}</td>
+          <td class="whitespace-nowrap">{{ row.score }} <span class="muted">· {{ row.score|fedelta }}</span></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="muted">
+            {% if q %}
+              Nessun cliente trovato per "{{ q }}".
+            {% else %}
+              Ancora nessun cliente. <a href="/clienti/nuovo">Aggiungi il primo</a>.
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if partial %}
+  <input type="hidden" id="ordina" name="ordina" value="{{ sort }}" hx-swap-oob="true">
+{% endif %}

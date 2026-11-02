@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Registrati · Bottega{% endblock %}
+
+{% block content %}
+  <div class="max-w-sm">
+    <h1>Registra la tua attività</h1>
+    <p class="muted mt-1">Ogni attività vede solo i propri clienti.</p>
+
+    {% if error %}<p class="alert mt-4">{{ error }}</p>{% endif %}
+
+    <form method="post" action="/registrati" class="mt-5">
+      <div class="field">
+        <label for="business_name">Nome dell'attività</label>
+        <input id="business_name" name="business_name" value="{{ business_name or '' }}" maxlength="100" placeholder="Es. Salone Anna" required autofocus>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="{{ email or '' }}" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required>
+        <p class="hint">Almeno 8 caratteri.</p>
+      </div>
+      <button class="btn">Crea l'account</button>
+    </form>
+
+    <p class="mt-6 text-sm muted">Hai già un account? <a href="/accedi">Accedi</a></p>
+  </div>
+{% endblock %}
