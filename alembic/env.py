@@ -1,30 +1,27 @@
-"""Configurazione di Alembic: dice dove si trova il database e quali sono i modelli."""
+"""Configurazione di Alembic: usa lo stesso database e gli stessi modelli dell'app."""
 
 from logging.config import fileConfig
 
 from alembic import context
 
-import app.models  # noqa: F401  (importa tutti i modelli, così Alembic li vede)
 from app.config import settings
-from app.database import Base, engine
+from app.database import engine
+from app.models import Base
 
 config = context.config
 
-# Configura i messaggi di log a partire da alembic.ini
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Lo "stato desiderato" del database: Alembic lo confronta con quello reale
-# per generare le migrazioni (--autogenerate)
 target_metadata = Base.metadata
 
-# SQLite sa modificare poco le tabelle esistenti: la modalità "batch"
-# ricrea la tabella e ricopia i dati quando serve
+# SQLite non sa fare quasi nessun ALTER TABLE: in modalità batch Alembic
+# ricrea la tabella e ricopia i dati
 render_as_batch = settings.database_url.startswith("sqlite")
 
 
 def run_migrations_offline() -> None:
-    """Modalità offline: genera lo script SQL senza collegarsi al database."""
+    """Genera lo script SQL senza collegarsi al database."""
     context.configure(
         url=settings.database_url,
         target_metadata=target_metadata,
@@ -38,10 +35,7 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Modalità normale: si collega al database e applica le migrazioni.
-
-    Usa lo stesso engine dell'app, quindi l'indirizzo arriva dal file .env.
-    """
+    """Si collega al database e applica le migrazioni."""
     with engine.connect() as connection:
         context.configure(
             connection=connection,
