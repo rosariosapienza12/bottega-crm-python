@@ -1,23 +1,32 @@
-"""Impostazioni dell'applicazione, lette dal file .env."""
+"""Impostazioni lette dal file .env."""
 
 from pathlib import Path
 
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Cartella principale del progetto (quella che contiene .env)
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    # Ogni attributo corrisponde a una variabile del file .env
-    # (DATABASE_URL -> database_url: maiuscole e minuscole non contano).
-    database_url: str = "sqlite:///./bottega.db"
-    # Nessun valore predefinito: se manca nel .env l'app non parte.
-    # Meglio un errore subito che una chiave segreta finta in produzione.
-    secret_key: str
-
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env")
 
+    # Nessun default: se mancano nel .env l'app si ferma subito
+    database_url: str
+    # SecretStr: se finisce in un log o in un errore si vede "**********"
+    secret_key: SecretStr
 
-# Un'unica istanza condivisa da tutta l'applicazione
+    @field_validator("database_url")
+    @classmethod
+    def anchor_sqlite_path(cls, url: str) -> str:
+        # Un percorso relativo dipenderebbe dalla cartella da cui si lancia
+        # il comando (uvicorn, alembic...): lo leghiamo a quella del progetto
+        prefix = "sqlite:///"
+        if url.startswith(prefix) and url != prefix + ":memory:":
+            path = Path(url.removeprefix(prefix))
+            if not path.is_absolute():
+                return prefix + (BASE_DIR / path).as_posix()
+        return url
+
+
 settings = Settings()
