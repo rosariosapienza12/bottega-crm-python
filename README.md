@@ -33,8 +33,8 @@ deployment with Docker.
 ## Running it locally (Windows / PowerShell)
 
 ```powershell
-git clone https://github.com/rosariosapienza12/Bottega-crm.git
-cd Bottega-crm
+git clone https://github.com/rosariosapienza12/bottega-crm-python.git
+cd bottega-crm-python
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
