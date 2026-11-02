@@ -4,15 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ app_name }}</title>
-  <!-- Tailwind da CDN: comodo in sviluppo, in produzione lo compileremo -->
+  <!-- CDN solo per lo sviluppo, in produzione Tailwind va compilato -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
 </head>
-<body class="min-h-screen bg-stone-50 text-stone-800 flex items-center justify-center p-4">
-  <main class="max-w-md text-center">
-    <h1 class="text-4xl font-bold text-amber-700">Benvenuto in {{ app_name }}</h1>
-    <p class="mt-4 text-lg">
-      Il CRM per piccole attività: ricordati dei tuoi clienti,
-      e loro si ricorderanno di te.
+<body class="min-h-screen bg-white text-slate-800">
+  <header class="border-b border-slate-200">
+    <div class="mx-auto flex max-w-3xl items-baseline gap-3 px-4 py-3">
+      <span class="font-semibold text-emerald-800">{{ app_name }}</span>
+      <span class="text-sm text-slate-500">gestione clienti</span>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-3xl px-4 py-10">
+    <h1 class="text-2xl font-semibold">Gestione clienti per piccole attività</h1>
+    <p class="mt-3 max-w-prose text-slate-600">
+      Schede clienti, appuntamenti e storico delle visite per parrucchieri,
+      estetisti, palestre e negozi. Bottega ti mostra chi non passa da un po',
+      così puoi scrivergli su WhatsApp prima di perderlo.
+    </p>
+
+    <p class="mt-8 border-l-2 border-emerald-700 pl-3 text-sm text-slate-500">
+      In sviluppo: login e schede clienti sono i prossimi passi.
     </p>
   </main>
 </body>
