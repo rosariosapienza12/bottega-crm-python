@@ -9,7 +9,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
+    from app.models.appointment import Appointment
     from app.models.business import Business
+    from app.models.visit import Visit
 
 
 class Customer(Base):
@@ -34,3 +36,18 @@ class Customer(Base):
     )
 
     business: Mapped["Business"] = relationship(back_populates="customers")
+    # Dalla più recente
+    visits: Mapped[list["Visit"]] = relationship(
+        back_populates="customer",
+        cascade="all, delete-orphan",
+        order_by="(desc(Visit.visited_on), desc(Visit.id))",
+    )
+    appointments: Mapped[list["Appointment"]] = relationship(
+        back_populates="customer",
+        cascade="all, delete-orphan",
+        order_by="Appointment.starts_at",
+    )
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
