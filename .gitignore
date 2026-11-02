@@ -1,5 +1,7 @@
 # --- Segreti: non devono MAI finire su GitHub ---
 .env
+.env.*
+!.env.example
 
 # --- Ambiente virtuale Python (si ricrea con requirements.txt) ---
 .venv/
