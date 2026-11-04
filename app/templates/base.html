@@ -33,7 +33,7 @@
   {% endmacro %}
   <div class="app">
     <aside class="side">
-      <div class="shop">{{ user.business.name }}<small>{{ user.email }}</small></div>
+      <div class="shop">{{ user.business.name }}<small>{{ "Account di prova" if is_demo_email(user.email) else user.email }}</small></div>
       <nav aria-label="Sezioni">
         {{ nav_link("/panoramica", "Panoramica", '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>') }}
         {{ nav_link("/agenda", "Agenda", '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>') }}

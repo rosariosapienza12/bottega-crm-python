@@ -197,3 +197,11 @@ Con la chiave d'esempio di `.env.example` (pubblica su GitHub) o una chiave
 corta, chiunque potrebbe firmare un cookie finto ed entrare come un altro
 utente. Per questo l'app si rifiuta di partire se la chiave ha meno di 32
 caratteri o è quella d'esempio. Meglio un errore subito che un sito insicuro.
+
+## Server e database nella stessa città
+Vercel di base fa girare il codice a Washington, ma il database su Neon è a
+Francoforte. La Panoramica fa 12 query: ognuna attraversava l'oceano andata e
+ritorno (circa 90 ms), quindi più di un secondo di attesa a ogni apertura.
+`vercel.json` sposta il codice a Francoforte (`fra1`): il piano gratuito
+permette una sola regione, e va scelta quella del database. Ho misurato anche
+Tailwind nel browser: non pesava, quindi resta così.

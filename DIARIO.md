@@ -166,3 +166,21 @@ Cosa ho imparato:
 - Un advisory lock di PostgreSQL è un lucchetto con un numero come nome:
   chi arriva secondo aspetta.
 - Il dominio .invalid è riservato: nessuna email ci può arrivare.
+
+Dopo la messa online:
+
+- Il CRM era lento a cambiare sezione: codice negli USA e database in Europa.
+  Ho contato le query di ogni pagina (la Panoramica ne fa 12) e spostato il
+  codice a Francoforte con vercel.json.
+- Su un PC grande il contenuto occupava solo una parte dello schermo: tolto il
+  limite di larghezza.
+- Nella pagina iniziale c'era un'anteprima con appuntamenti finti: ora c'è
+  l'elenco delle funzioni principali.
+- Nel menu, al posto dell'indirizzo lunghissimo dell'account demo, c'è
+  "Account di prova".
+
+Cosa ho imparato:
+- La latenza (il tempo di andata e ritorno) si moltiplica per il numero di
+  query: 12 query × 90 ms = più di un secondo.
+- Prima di ottimizzare bisogna misurare: Tailwind nel browser sembrava un
+  sospetto, ma non era lui il problema.
