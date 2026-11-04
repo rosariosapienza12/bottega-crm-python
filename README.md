@@ -44,8 +44,30 @@ Bottega is a learning project, built step by step.
 
 The interface is in Italian, since it is meant for small businesses in Italy.
 
-Still to do: an AI-generated summary of a customer's history, deployment
-with Docker and PostgreSQL.
+Still to do: an AI-generated summary of a customer's history, and a
+PostgreSQL database for real (non-demo) use.
+
+## Online demo
+
+The repository includes a `Dockerfile` and a `render.yaml` blueprint for
+[Render](https://render.com)'s free plan. The online version runs in **demo
+mode** (`DEMO_MODE=true`): a "Prova la demo" button logs straight into a sample
+business, a banner says the data is fake, and everything is reset whenever the
+server restarts (the free plan has no persistent disk). After 15 minutes
+without visits the free server sleeps, so the first page can take up to a
+minute to load.
+
+To deploy: on Render choose **New > Blueprint** and pick this repository.
+Render generates `SECRET_KEY` by itself, so no secret is ever written in the
+code.
+
+Run the same image locally:
+
+```bash
+docker build -t bottega .
+docker run -p 8000:8000 -e SECRET_KEY=<32+ random characters> \
+  -e DATABASE_URL=sqlite:///bottega.db -e DEMO_MODE=true bottega
+```
 
 ## Tech stack
 

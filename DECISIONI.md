@@ -160,3 +160,27 @@ riquadro in cui si trova, non quella dello schermo. Così passa su due righe
 (ora, cliente e servizio sopra, pulsanti sotto) sia su telefono sia nel
 riquadro stretto "Oggi" della Panoramica su computer. Una media query avrebbe
 sistemato solo il telefono.
+
+## Demo online gratuita su Render, con Docker
+Render ha un piano gratuito senza carta di credito per le app Python. Due
+limiti: dopo 15 minuti senza visite il server si spegne (la prima pagina
+dopo ci mette fino a un minuto) e il disco si azzera a ogni riavvio. Il
+secondo limite lo usiamo a nostro favore: la versione online è una demo con
+SQLite, che a ogni avvio ricrea l'attività di prova (`DEMO_MODE=true`).
+Chi apre il link dal curriculum entra con un tocco e trova sempre dati puliti.
+Alternative scartate: Railway (solo una prova a tempo), PythonAnywhere (nel
+piano gratuito non supporta FastAPI). Per clienti veri servirà PostgreSQL
+esterno: il codice è già pronto perché passa da SQLAlchemy.
+
+Il Dockerfile fa girare l'app con un utente normale, non root. `render.yaml`
+fa generare a Render la SECRET_KEY: non è scritta da nessuna parte.
+`FORWARDED_ALLOW_IPS="*"` dice a uvicorn di fidarsi dell'IP scritto dal proxy:
+va bene solo perché su Render il container si raggiunge esclusivamente
+attraverso il loro proxy. Su un server esposto direttamente andrebbe messo
+l'IP del proxy.
+
+## La SECRET_KEY viene controllata all'avvio
+Con la chiave d'esempio di `.env.example` (pubblica su GitHub) o una chiave
+corta, chiunque potrebbe firmare un cookie finto ed entrare come un altro
+utente. Per questo l'app si rifiuta di partire se la chiave ha meno di 32
+caratteri o è quella d'esempio. Meglio un errore subito che un sito insicuro.

@@ -111,3 +111,24 @@ Cosa ho imparato:
 - Cos'è una container query e la differenza con una media query.
 - X-Frame-Options impedisce di mostrare le pagine dentro un iframe: è una
   difesa contro il clickjacking.
+
+Sera:
+
+- Revisione di sicurezza prima di mettere l'app online. Corretti tre punti:
+  l'app non parte con una SECRET_KEY debole o d'esempio, lo script della demo
+  funziona solo su SQLite, e gli id nei form accettano solo cifre 0-9.
+- Modalità demo: pulsante "Prova la demo" e striscia che avvisa che i dati
+  sono finti. Senza DEMO_MODE la rotta /demo risponde 404.
+- Dockerfile, script di avvio e render.yaml per la demo gratuita su Render.
+  Immagine provata: parte, carica i dati di prova e gira senza root.
+- 151 test in tutto.
+
+Cosa ho imparato:
+- "²".isdigit() è vero ma int("²") va in errore: per i numeri meglio una
+  regex con [0-9].
+- Un test che prima di una correzione fallisce e dopo passa dimostra che la
+  correzione serve davvero.
+- Dietro un proxy l'app vede l'IP del proxy, non quello del visitatore:
+  serve --proxy-headers, e bisogna dire di quali proxy fidarsi.
+- Nel Dockerfile si copia prima requirements.txt e poi il codice, così Docker
+  riusa le librerie già installate quando cambia solo il codice.
