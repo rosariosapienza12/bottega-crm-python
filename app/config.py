@@ -43,6 +43,16 @@ class Settings(BaseSettings):
 
     @field_validator("database_url")
     @classmethod
+    def use_psycopg_driver(cls, url: str) -> str:
+        # Neon e gli altri servizi danno indirizzi "postgresql://" (o "postgres://"):
+        # SQLAlchemy li userebbe con il vecchio driver psycopg2, noi usiamo psycopg 3
+        for prefix in ("postgresql://", "postgres://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url.removeprefix(prefix)
+        return url
+
+    @field_validator("database_url")
+    @classmethod
     def anchor_sqlite_path(cls, url: str) -> str:
         # Un percorso relativo dipenderebbe dalla cartella da cui si lancia
         # il comando (uvicorn, alembic...): lo leghiamo a quella del progetto

@@ -234,3 +234,15 @@ def test_strange_quantity_in_stock_is_refused(logged_in, db):
 
     assert response.status_code != 500
     assert db.scalars(select(Product)).first() is None
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["postgresql://u:p@db.example.com/crm?sslmode=require", "postgres://u:p@db.example.com/crm?sslmode=require"],
+)
+def test_postgres_urls_use_psycopg_driver(url):
+    from app.config import Settings
+
+    settings = Settings(database_url=url, secret_key="x" * 32)
+
+    assert settings.database_url == "postgresql+psycopg://u:p@db.example.com/crm?sslmode=require"

@@ -11,6 +11,8 @@ email-validator==2.3.0
 # --- Database ---
 sqlalchemy==2.1.6
 alembic==1.20.0
+# Driver per PostgreSQL (il database online, su Neon); "binary" include già libpq
+psycopg[binary]==3.3.8
 
 # --- Sicurezza (hash delle password, cookie firmati) ---
 pwdlib[argon2]==0.3.1
