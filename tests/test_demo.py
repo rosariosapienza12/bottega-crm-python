@@ -117,3 +117,12 @@ def test_demo_business_has_a_complete_quote(db):
     quote = db.scalars(select(Quote).where(Quote.business_id == user.business_id)).one()
     assert quote.request is not None
     assert len(quote.lines) == 4
+
+
+def test_demo_menu_shows_a_short_label_instead_of_the_address(client, demo_on):
+    client.post("/demo")
+
+    page = client.get("/panoramica").text
+
+    assert "Account di prova" in page
+    assert f"@{DEMO_DOMAIN}" not in page

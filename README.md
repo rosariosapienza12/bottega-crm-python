@@ -75,6 +75,11 @@ To deploy:
 
 3. Deploy.
 
+`vercel.json` runs the app in Frankfurt (`fra1`), next to a Neon database in
+Frankfurt. The overview page makes 12 database queries: with the app in the US
+and the database in Europe, that alone added about a second to every visit.
+Pick the region of your database.
+
 The `Dockerfile` runs the same app on any server with Docker.
 
 ## Tech stack

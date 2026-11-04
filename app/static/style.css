@@ -70,7 +70,7 @@ h2 { font-size: 1.1rem; font-weight: 650; }
   background: var(--side); color: var(--side-ink);
 }
 .side .shop { font-family: var(--f-head); font-weight: 700; font-size: 1.15rem; line-height: 1.2; padding: 0 0.6rem; }
-.side .shop small { display: block; font-family: var(--f-body); font-weight: 500; font-size: 0.8rem; color: var(--side-muted); margin-top: 0.15rem; }
+.side .shop small { display: block; font-family: var(--f-body); font-weight: 500; font-size: 0.8rem; color: var(--side-muted); margin-top: 0.15rem; overflow-wrap: anywhere; }
 .side nav { display: flex; flex-direction: column; gap: 2px; }
 .side nav a {
   color: var(--side-ink); text-decoration: none;
@@ -84,7 +84,9 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 .side .foot button { background: none; border: 0; padding: 0; color: var(--side-muted); font: inherit; cursor: pointer; text-align: left; }
 .side .foot button:hover { color: var(--side-ink); }
 
-.content { padding: 2rem 2.2rem 3rem; max-width: 1180px; }
+/* Tutta la larghezza accanto al menu: su uno schermo grande un limite fisso
+   lasciava una fascia vuota a destra */
+.content { padding: 2rem 2.2rem 3rem; min-width: 0; }
 /* Gli elementi di una griglia di default non scendono sotto la larghezza del
    loro contenuto (grafici, tabelle): così invece si restringono e le tabelle
    scorrono dentro il loro riquadro, senza spingere fuori la pagina */
@@ -95,10 +97,13 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 .brand::before { content: ""; display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; background: var(--green); margin-right: 0.45rem; }
 
 .hero { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; max-width: 14ch; }
-.preview { list-style: none; margin: 0.8rem 0 0; padding: 0; }
-.preview li { display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; align-items: baseline; padding: 0.55rem 0; border-top: 1px solid var(--line); }
-.preview li.warn { box-shadow: inset 3px 0 0 var(--green); padding-left: 0.7rem; }
-.preview .wa { margin-left: auto; font-size: 0.875rem; }
+
+/* Pagina iniziale: le funzioni principali */
+.features { list-style: none; padding: 0.4rem 1.25rem; }
+.features li { display: grid; gap: 0.15rem; padding: 0.8rem 0; }
+.features li + li { border-top: 1px solid var(--line); }
+.features b { font-family: var(--f-head); font-weight: 700; }
+.features span { color: var(--muted); font-size: 0.95rem; }
 
 .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.75rem 1.5rem; margin-bottom: 1.5rem; }
 .page-head p { margin: 0.3rem 0 0; color: var(--muted); }
