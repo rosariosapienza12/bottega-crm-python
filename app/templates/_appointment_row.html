@@ -19,8 +19,9 @@
         </form>
       {% else %}
         {% set customer = appointment.customer %}
-        <a class="wa" target="_blank" rel="noopener noreferrer"
-           href="{{ whatsapp_link(customer.phone, reminder_text(customer.first_name, customer.business.name, appointment.starts_at, appointment.service)) }}">Ricorda su WhatsApp</a>
+        <a class="wa text-sm" target="_blank" rel="noopener noreferrer"
+           title="Manda il promemoria su WhatsApp" aria-label="Manda il promemoria su WhatsApp"
+           href="{{ whatsapp_link(customer.phone, reminder_text(customer.first_name, customer.business.name, appointment.starts_at, appointment.service)) }}">promemoria</a>
       {% endif %}
       <button class="link link-danger text-sm"
               hx-post="/appuntamenti/{{ appointment.id }}/annulla"

@@ -106,7 +106,7 @@ def test_whatsapp_reminder_only_for_future_appointments(logged_in):
     page = logged_in.get(url).text
 
     # Un solo link: quello dell'appuntamento di domani, già passato non serve
-    assert page.count("Ricorda su WhatsApp") == 1
+    assert page.count("Manda il promemoria su WhatsApp") == 2  # title e aria-label
     assert "domani%20alle" in page and "%28Permanente%29" in page
 
 
@@ -116,9 +116,11 @@ def test_whatsapp_reminder_cannot_inject_html(logged_in):
     add_appointment(logged_in, url, datetime.now() + timedelta(days=1), service='"><img src=x>')
 
     page = logged_in.get(url).text
-    link = page.split("Ricorda su WhatsApp")[0].rsplit('href="', 1)[1]
+    # L'href viene subito dopo l'aria-label del link del promemoria
+    after_label = page.split('aria-label="Manda il promemoria su WhatsApp"', 1)[1]
+    link = after_label.split('href="https://wa.me/', 1)[1].split('"', 1)[0]
 
-    assert link.startswith("https://wa.me/393331234567?text=Ciao%20Eva%22%3E%3Cscript%3E")
+    assert link.startswith("393331234567?text=Ciao%20Eva%22%3E%3Cscript%3E")
     assert "<script>alert(1)" not in page
     assert "<img src=x>" not in page
 

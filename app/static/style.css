@@ -1,6 +1,6 @@
 /* Bottega: colori, caratteri e componenti.
    Tailwind lo uso per layout e spaziature, qui c'è l'identità vera e propria.
-   Viola per struttura e azioni su fondo bianco, senape per i soldi e le cose da guardare. */
+   Viola per struttura e azioni su fondo bianco, verde per i soldi e le cose da guardare. */
 
 :root {
   --bg: #faf9fd;
@@ -13,8 +13,8 @@
   --violet: #6d28d9;
   --violet-ink: #ffffff;
   --violet-soft: #ede5fb;
-  --mustard: #c98f0e;
-  --mustard-soft: #f6ead0;
+  --green: #15803d;
+  --green-soft: #dcfce7;
   --pos: #2a7a4b;
   --neg: #b0402e;
   --neg-soft: #f6dfda;
@@ -30,24 +30,12 @@
   color-scheme: light;
 }
 
-/* Tema scuro: segue il sistema, a meno che l'utente non abbia scelto */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #120e1a; --surface: #1b1626; --sunken: #0d0a13; --line: #2c2540;
-    --ink: #ece8f5; --muted: #a59cba;
-    --violet: #b18cf5; --violet-ink: #1a0f2e; --violet-soft: #2a1d45;
-    --mustard: #e6b443; --mustard-soft: #33290f;
-    --pos: #6cc191; --neg: #ef8d7b; --neg-soft: #3a1d18;
-    --side: #0c0912; --side-ink: #ece8f5; --side-muted: #9a8fb3;
-    --side-hover: #1b1528; --side-active: #2a2040;
-    color-scheme: dark;
-  }
-}
+/* Tema scuro: solo se l'utente lo sceglie dal pulsante, di base è bianco e viola */
 :root[data-theme="dark"] {
   --bg: #120e1a; --surface: #1b1626; --sunken: #0d0a13; --line: #2c2540;
   --ink: #ece8f5; --muted: #a59cba;
   --violet: #b18cf5; --violet-ink: #1a0f2e; --violet-soft: #2a1d45;
-  --mustard: #e6b443; --mustard-soft: #33290f;
+  --green: #4ade80; --green-soft: #10301c;
   --pos: #6cc191; --neg: #ef8d7b; --neg-soft: #3a1d18;
   --side: #0c0912; --side-ink: #ece8f5; --side-muted: #9a8fb3;
   --side-hover: #1b1528; --side-active: #2a2040;
@@ -65,7 +53,7 @@ body {
 }
 
 a { color: var(--violet); text-underline-offset: 3px; }
-:focus-visible { outline: 2px solid var(--mustard); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 h1, h2, h3 { font-family: var(--f-head); margin: 0; letter-spacing: -0.015em; }
 h1 { font-size: 1.9rem; font-weight: 700; line-height: 1.1; }
@@ -90,7 +78,7 @@ h2 { font-size: 1.1rem; font-weight: 650; }
   display: flex; align-items: center; gap: 0.6rem;
 }
 .side nav a:hover { background: var(--side-hover); }
-.side nav a[aria-current="page"] { background: var(--side-active); box-shadow: inset 3px 0 0 var(--mustard); }
+.side nav a[aria-current="page"] { background: var(--side-active); box-shadow: inset 3px 0 0 var(--green); }
 .side nav svg { width: 18px; height: 18px; flex: none; opacity: 0.85; }
 .side .foot { margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem; padding: 0 0.6rem; font-size: 0.875rem; }
 .side .foot button { background: none; border: 0; padding: 0; color: var(--side-muted); font: inherit; cursor: pointer; text-align: left; }
@@ -104,12 +92,12 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 
 .public { margin: 0 auto; max-width: 980px; }
 .brand { font-family: var(--f-head); font-weight: 800; font-size: 1.35rem; color: var(--ink); text-decoration: none; }
-.brand::before { content: ""; display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; background: var(--mustard); margin-right: 0.45rem; }
+.brand::before { content: ""; display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; background: var(--green); margin-right: 0.45rem; }
 
 .hero { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; max-width: 14ch; }
 .preview { list-style: none; margin: 0.8rem 0 0; padding: 0; }
 .preview li { display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; align-items: baseline; padding: 0.55rem 0; border-top: 1px solid var(--line); }
-.preview li.warn { box-shadow: inset 3px 0 0 var(--mustard); padding-left: 0.7rem; }
+.preview li.warn { box-shadow: inset 3px 0 0 var(--green); padding-left: 0.7rem; }
 .preview .wa { margin-left: auto; font-size: 0.875rem; }
 
 .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.75rem 1.5rem; margin-bottom: 1.5rem; }
@@ -139,7 +127,7 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 .strip > div + div { border-left: 1px solid var(--line); }
 .strip .label { font-size: 0.85rem; color: var(--muted); }
 .strip .value { font-family: var(--f-head); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-top: 0.2rem; }
-.strip .value.money { color: var(--mustard); }
+.strip .value.money { color: var(--green); }
 .strip .note { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
 @media (max-width: 860px) {
   .strip { grid-template-columns: 1fr 1fr; }
@@ -165,6 +153,23 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 .table.appt { table-layout: fixed; min-width: 34rem; }
 .table.appt td:first-child { width: 7.5rem; }
 .table.appt td:last-child { width: 15rem; }
+
+/* Quando il contenitore è stretto (telefono, riquadro "Oggi") ogni appuntamento
+   va su due righe: ora, cliente e servizio sopra, i pulsanti sotto.
+   Container query: guarda la larghezza del riquadro, non dello schermo. */
+.overflow-x-auto:has(> .table.appt) { container-type: inline-size; }
+@container (max-width: 34rem) {
+  .table.appt { min-width: 0; }
+  .table.appt tbody, .table.appt tr { display: block; }
+  .table.appt tr {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: baseline;
+    gap: 0.35rem 0.75rem; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--line);
+  }
+  .table.appt td { display: block; width: auto; padding: 0; border: 0; min-width: 0; overflow-wrap: anywhere; }
+  .table.appt td:first-child, .table.appt td:last-child { width: auto; }
+  .table.appt td:last-child { grid-column: 1 / -1; }
+  .table.appt td:last-child > div { justify-content: flex-start; }
+}
 
 /* ---------- Pulsanti e form ---------- */
 .btn {
@@ -203,19 +208,19 @@ input.amount-input:invalid { border-color: var(--neg); }
 .notes { white-space: pre-line; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; }
 .wa { color: var(--pos); font-weight: 600; white-space: nowrap; }
 .tag { display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 0.05rem 0.5rem; border-radius: 999px; background: var(--sunken); color: var(--muted); }
-.tag-warn { background: var(--mustard-soft); color: var(--mustard); }
+.tag-warn { background: var(--green-soft); color: var(--green); }
 .tag-bad { background: var(--neg-soft); color: var(--neg); }
 
 /* ---------- Grafico incassi/spese ---------- */
 .chart { width: 100%; height: auto; display: block; }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart text { fill: var(--muted); font-size: 12px; font-family: var(--f-body); }
-.chart .in { fill: var(--mustard); }
+.chart .in { fill: var(--green); }
 .chart .out { fill: var(--muted); opacity: 0.45; }
 .chart .now text.month { fill: var(--ink); font-weight: 700; }
 .legend { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--muted); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
-.legend .in { background: var(--mustard); }
+.legend .in { background: var(--green); }
 .legend .out { background: var(--muted); opacity: 0.45; }
 
 .capitalize-first::first-letter { text-transform: uppercase; }
@@ -225,8 +230,8 @@ input.amount-input:invalid { border-color: var(--neg); }
 .bars li { display: grid; grid-template-columns: 1fr auto; gap: 0.15rem 1rem; }
 .bars meter { grid-column: 1 / -1; width: 100%; height: 8px; }
 .bars meter::-webkit-meter-bar { background: var(--sunken); border: 0; border-radius: 4px; }
-.bars meter::-webkit-meter-optimum-value { background: var(--mustard); border-radius: 4px; }
-.bars meter::-moz-meter-bar { background: var(--mustard); border-radius: 4px; }
+.bars meter::-webkit-meter-optimum-value { background: var(--green); border-radius: 4px; }
+.bars meter::-moz-meter-bar { background: var(--green); border-radius: 4px; }
 
 /* ---------- Agenda: una riga per giorno, oggi in evidenza ---------- */
 .week { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
@@ -234,7 +239,7 @@ input.amount-input:invalid { border-color: var(--neg); }
 .day + .day { border-top: 1px solid var(--line); }
 .day h2 { font-size: 1rem; padding-top: 0.5rem; }
 .day h2 span { display: block; font-family: var(--f-body); font-weight: 500; font-size: 0.85rem; color: var(--muted); }
-.day.is-today { box-shadow: inset 4px 0 0 var(--mustard); background: color-mix(in srgb, var(--mustard-soft) 45%, transparent); }
+.day.is-today { box-shadow: inset 4px 0 0 var(--green); background: color-mix(in srgb, var(--green-soft) 45%, transparent); }
 .day.is-empty p { padding-top: 0.55rem; }
 @media (max-width: 640px) { .day { grid-template-columns: 1fr; gap: 0.2rem; } }
 
@@ -263,7 +268,7 @@ input.amount-input:invalid { border-color: var(--neg); }
 .card select { margin-top: 0.5rem; padding: 0.2rem 0.4rem; font-size: 0.8rem; }
 .stage-nuova { --stage: #8c9a96; }
 .stage-contattata { --stage: #4f86a8; }
-.stage-preventivo { --stage: var(--mustard); }
+.stage-preventivo { --stage: var(--green); }
 .stage-confermata { --stage: var(--pos); }
 .stage-persa { --stage: var(--neg); }
 
@@ -289,7 +294,7 @@ input.amount-input:invalid { border-color: var(--neg); }
 /* ---------- Movimento: solo come risposta a un'azione ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .htmx-added { animation: arrive 0.35s ease-out; }
-  @keyframes arrive { from { background: var(--mustard-soft); } to { background: transparent; } }
+  @keyframes arrive { from { background: var(--green-soft); } to { background: transparent; } }
   .htmx-swapping { opacity: 0; transition: opacity 0.2s; }
 }
 

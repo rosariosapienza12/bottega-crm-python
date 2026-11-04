@@ -6,5 +6,5 @@ try {
     document.documentElement.dataset.theme = savedTheme;
   }
 } catch (e) {
-  // localStorage può essere bloccato (navigazione privata): resta il tema di sistema
+  // localStorage può essere bloccato (navigazione privata): resta il tema chiaro
 }

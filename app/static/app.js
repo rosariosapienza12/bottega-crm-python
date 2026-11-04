@@ -3,9 +3,8 @@
 // ---------- Tema chiaro / scuro ----------
 
 function isDark() {
-  var chosen = document.documentElement.dataset.theme;
-  if (chosen) return chosen === "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // Di base il tema è chiaro: scuro solo se scelto col pulsante
+  return document.documentElement.dataset.theme === "dark";
 }
 
 function updateThemeButton() {

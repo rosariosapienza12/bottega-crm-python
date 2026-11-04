@@ -141,9 +141,10 @@ Il grafico incassi/spese è un SVG generato da Jinja: nessuna libreria
 JavaScript da caricare e aggiornare, e funziona anche senza JavaScript.
 
 ## Stile
-Viola per struttura e azioni, senape per i soldi e le cose da guardare,
-fondo bianco (prima era verde pino su grigio-menta: cambiato a novembre).
-Verde e rosso restano solo per positivo/negativo. Bricolage Grotesque per i titoli, Figtree per il testo,
+Viola per struttura e azioni, verde per i soldi e le cose da guardare,
+fondo bianco (prima era verde pino e senape su grigio-menta: cambiato a
+novembre). Il tema di base è sempre quello chiaro, anche se il computer usa
+il tema scuro: lo scuro si sceglie dal pulsante. Bricolage Grotesque per i titoli, Figtree per il testo,
 con numeri incolonnati. Una sola cosa "forte" per pagina (il grafico, la
 pipeline, lo scontrino del preventivo), il resto sobrio.
 
@@ -152,3 +153,10 @@ Il messaggio lo prepara Bottega, ma lo invia il titolare dal suo WhatsApp.
 Le API di WhatsApp Business manderebbero tutto in automatico, ma servono un
 account aziendale verificato e si paga ogni messaggio. Così invece è gratis e
 il titolare può ritoccare il testo prima di inviarlo.
+
+## Appuntamenti su due righe quando lo spazio è poco
+Con una container query la tabella degli appuntamenti guarda la larghezza del
+riquadro in cui si trova, non quella dello schermo. Così passa su due righe
+(ora, cliente e servizio sopra, pulsanti sotto) sia su telefono sia nel
+riquadro stretto "Oggi" della Panoramica su computer. Una media query avrebbe
+sistemato solo il telefono.

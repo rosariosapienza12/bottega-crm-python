@@ -8,6 +8,10 @@ coming, and make it easy to get back in touch.
 
 Bottega is a learning project, built step by step.
 
+![Overview page with income chart, today's appointments and customers to contact](docs/screenshots/overview.jpg)
+
+![Weekly agenda with a WhatsApp reminder link on upcoming appointments](docs/screenshots/agenda.jpg)
+
 ## What it does
 
 - **Accounts per business.** Each owner registers their business and only
@@ -15,11 +19,14 @@ Bottega is a learning project, built step by step.
 - **Customers.** Records with phone, email, birthday and notes. The list has
   live search and can be sorted by name, last visit or loyalty.
 - **Visits.** Date, amount and what was done, added without reloading the page.
-- **Agenda.** A weekly view of appointments. When an appointment is over,
-  you type what the customer paid and press "Fatto": it becomes a visit.
-- **Overview.** Today's appointments, customers who haven't come back in
-  60 days and birthdays in the next two weeks, each with a pre-filled
-  WhatsApp message (wa.me link).
+- **Agenda.** A weekly view of appointments. Upcoming appointments have a
+  WhatsApp reminder link with a ready-made message that says when (today,
+  tomorrow or the date), at what time and for which treatment. When an
+  appointment is over, you type what the customer paid and press "Fatto":
+  it becomes a visit.
+- **Overview.** Today's appointments, customers who haven't been back for
+  more than 60 days, and birthdays in the next two weeks. Each customer to
+  contact comes with a pre-filled WhatsApp message (wa.me link).
 - **Loyalty score** from 0 to 100, based on visits and spending in the last
   year.
 - **Requests pipeline.** A board with columns (new, contacted, quote sent,
@@ -33,9 +40,9 @@ Bottega is a learning project, built step by step.
   server, and where the money goes by category.
 - **Stock.** Quantities with - / + buttons, minimum stock and a reorder list
   on the overview.
-- Light and dark theme, works on a phone.
+- Purple and white by default, with an optional dark theme. Works on a phone.
 
-The interface is in Italian, since that's who it's for.
+The interface is in Italian, since it is meant for small businesses in Italy.
 
 Still to do: an AI-generated summary of a customer's history, deployment
 with Docker and PostgreSQL.
@@ -87,7 +94,8 @@ touch your `.env` or `bottega.db`.
 
 ## Security
 
-- Passwords hashed with Argon2; login blocked after 5 wrong attempts.
+- Passwords hashed with Argon2; login blocked for 15 minutes after 5 wrong
+  attempts.
 - Signed session cookie (HttpOnly, SameSite=Lax); logging out also
   invalidates copies of the cookie.
 - Every query is filtered by the logged-in business; tests try to read and
@@ -96,6 +104,9 @@ touch your `.env` or `bottega.db`.
 - Strict Content-Security-Policy (no inline scripts), subresource integrity
   on CDN scripts, `X-Frame-Options`, `no-store` on private pages.
 - Secrets only in `.env`, never committed; `SECRET_KEY` is a `SecretStr`.
+- User input in WhatsApp links is URL-encoded and HTML-escaped; a test
+  saves a customer whose name contains a `<script>` tag and checks that it
+  never reaches the page as HTML.
 
 ## Project structure
 
@@ -115,9 +126,18 @@ app/
   dates.py        date parsing with sane year limits
   money.py        euro amounts stored as integer cents
   phone.py        phone numbers and WhatsApp links
+  messages.py     ready-made WhatsApp texts (reminder, come back, birthday)
+  security.py     password hashing
+  templating.py   Jinja2 setup and filters for dates and amounts
   templates/      Jinja2 templates (files starting with _ are HTMX fragments)
   static/         stylesheets and a little JS (theme, drag and drop)
 alembic/          database migrations
 scripts/          crea_demo.py: demo business with sample data
 tests/            pytest tests, including "attacker" tests
+docs/screenshots/ images used in this README
 ```
+
+## Development notes
+
+`DIARIO.md` (a log of each work session) and `DECISIONI.md` (the main
+technical decisions and why they were made) are written in Italian.

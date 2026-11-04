@@ -98,3 +98,16 @@ Cosa ho imparato:
 - Contro l'XSS ci sono due difese: la codifica del link (quote) e
   l'escaping automatico di Jinja.
 - Il browser tiene in memoria i file CSS: dopo un cambio serve Ctrl+F5.
+
+Più tardi:
+
+- Tema bianco e viola di base anche con il computer in tema scuro; il giallo
+  senape è diventato verde.
+- Controllo da telefono di tutte le pagine. Nell'agenda nome e servizio si
+  sovrapponevano: ora ogni appuntamento va su due righe quando lo spazio è poco.
+- README aggiornato, con due screenshot.
+
+Cosa ho imparato:
+- Cos'è una container query e la differenza con una media query.
+- X-Frame-Options impedisce di mostrare le pagine dentro un iframe: è una
+  difesa contro il clickjacking.
