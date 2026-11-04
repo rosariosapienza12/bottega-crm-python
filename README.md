@@ -79,8 +79,8 @@ pytest.
 ## Running it locally (Windows / PowerShell)
 
 ```powershell
-git clone https://github.com/rosariosapienza12/bottega-crm-python.git
-cd bottega-crm-python
+git clone https://github.com/rosariosapienza12/crm-piccola-attivita.git
+cd crm-piccola-attivita
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
