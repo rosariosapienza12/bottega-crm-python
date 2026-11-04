@@ -80,3 +80,21 @@ Cosa ho imparato:
 - Perché l'arrotondamento "al pari" di Python non va bene per i soldi.
 - Cos'è una race condition, e perché il +1 del magazzino lo fa il database.
 - Che min-width: 0 sugli elementi di una griglia evita che la pagina sbordi.
+
+## 4 novembre 2026
+
+- Colori nuovi: viola e bianco. Bastava cambiare le variabili in cima a
+  style.css (e print.css per il preventivo da stampare).
+- Nei dati di prova le richieste avevano l'occasione nel titolo ("per la
+  comunione della figlia"): ora c'è solo il trattamento.
+- Promemoria WhatsApp sugli appuntamenti futuri, in agenda, Panoramica e
+  scheda cliente. Messaggio con oggi / domani / data, ora e trattamento.
+- Test: i casi del testo, il link solo sugli appuntamenti futuri e un nome
+  "cattivo" con dentro uno <script>. 140 test in tutto.
+
+Cosa ho imparato:
+- Passare la data di oggi come parametro rende il test sempre uguale
+  (deterministico), qualunque giorno lo lanci.
+- Contro l'XSS ci sono due difese: la codifica del link (quote) e
+  l'escaping automatico di Jinja.
+- Il browser tiene in memoria i file CSS: dopo un cambio serve Ctrl+F5.

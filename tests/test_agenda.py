@@ -98,6 +98,31 @@ def test_done_with_bad_amount_changes_nothing(logged_in, db):
     assert db.scalars(select(Visit)).first() is None
 
 
+def test_whatsapp_reminder_only_for_future_appointments(logged_in):
+    url = add_customer(logged_in)
+    add_appointment(logged_in, url, datetime.now() + timedelta(days=1), service="Permanente")
+    add_appointment(logged_in, url, datetime.now() - timedelta(hours=1), service="Colore")
+
+    page = logged_in.get(url).text
+
+    # Un solo link: quello dell'appuntamento di domani, già passato non serve
+    assert page.count("Ricorda su WhatsApp") == 1
+    assert "domani%20alle" in page and "%28Permanente%29" in page
+
+
+def test_whatsapp_reminder_cannot_inject_html(logged_in):
+    # Un nome "cattivo" non deve uscire dall'attributo href né diventare uno <script>
+    url = add_customer(logged_in, first_name='Eva"><script>alert(1)</script>')
+    add_appointment(logged_in, url, datetime.now() + timedelta(days=1), service='"><img src=x>')
+
+    page = logged_in.get(url).text
+    link = page.split("Ricorda su WhatsApp")[0].rsplit('href="', 1)[1]
+
+    assert link.startswith("https://wa.me/393331234567?text=Ciao%20Eva%22%3E%3Cscript%3E")
+    assert "<script>alert(1)" not in page
+    assert "<img src=x>" not in page
+
+
 def test_cancel_appointment(logged_in, db):
     url = add_customer(logged_in)
     add_appointment(logged_in, url, datetime.now() + timedelta(days=1))

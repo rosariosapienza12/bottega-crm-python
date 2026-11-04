@@ -1,29 +1,29 @@
 /* Bottega: colori, caratteri e componenti.
    Tailwind lo uso per layout e spaziature, qui c'è l'identità vera e propria.
-   Verde pino per struttura e azioni, senape per i soldi e le cose da guardare. */
+   Viola per struttura e azioni su fondo bianco, senape per i soldi e le cose da guardare. */
 
 :root {
-  --bg: #eef2f1;
+  --bg: #faf9fd;
   --surface: #ffffff;
-  --sunken: #e2e9e6;
-  --line: #d2dbd8;
-  --ink: #1b2321;
-  --muted: #5a6965;
+  --sunken: #efeaf8;
+  --line: #e2dcef;
+  --ink: #1e1730;
+  --muted: #6b6380;
 
-  --pine: #1f4a40;
-  --pine-ink: #ffffff;
-  --pine-soft: #dbeae5;
+  --violet: #6d28d9;
+  --violet-ink: #ffffff;
+  --violet-soft: #ede5fb;
   --mustard: #c98f0e;
   --mustard-soft: #f6ead0;
   --pos: #2a7a4b;
   --neg: #b0402e;
   --neg-soft: #f6dfda;
 
-  --side: #173a32;
-  --side-ink: #e6f0ec;
-  --side-muted: #98b5ad;
-  --side-hover: #20483f;
-  --side-active: #2a5b4e;
+  --side: #3b1a6e;
+  --side-ink: #f3eefc;
+  --side-muted: #b9a8dc;
+  --side-hover: #4a2486;
+  --side-active: #5b2fa0;
 
   --f-head: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
@@ -33,24 +33,24 @@
 /* Tema scuro: segue il sistema, a meno che l'utente non abbia scelto */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #101715; --surface: #17201d; --sunken: #0c1210; --line: #26332f;
-    --ink: #e3ebe8; --muted: #93a39e;
-    --pine: #62b199; --pine-ink: #0b1d18; --pine-soft: #1b322b;
+    --bg: #120e1a; --surface: #1b1626; --sunken: #0d0a13; --line: #2c2540;
+    --ink: #ece8f5; --muted: #a59cba;
+    --violet: #b18cf5; --violet-ink: #1a0f2e; --violet-soft: #2a1d45;
     --mustard: #e6b443; --mustard-soft: #33290f;
     --pos: #6cc191; --neg: #ef8d7b; --neg-soft: #3a1d18;
-    --side: #0a0f0d; --side-ink: #e3ebe8; --side-muted: #8aa199;
-    --side-hover: #16201d; --side-active: #1f332d;
+    --side: #0c0912; --side-ink: #ece8f5; --side-muted: #9a8fb3;
+    --side-hover: #1b1528; --side-active: #2a2040;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101715; --surface: #17201d; --sunken: #0c1210; --line: #26332f;
-  --ink: #e3ebe8; --muted: #93a39e;
-  --pine: #62b199; --pine-ink: #0b1d18; --pine-soft: #1b322b;
+  --bg: #120e1a; --surface: #1b1626; --sunken: #0d0a13; --line: #2c2540;
+  --ink: #ece8f5; --muted: #a59cba;
+  --violet: #b18cf5; --violet-ink: #1a0f2e; --violet-soft: #2a1d45;
   --mustard: #e6b443; --mustard-soft: #33290f;
   --pos: #6cc191; --neg: #ef8d7b; --neg-soft: #3a1d18;
-  --side: #0a0f0d; --side-ink: #e3ebe8; --side-muted: #8aa199;
-  --side-hover: #16201d; --side-active: #1f332d;
+  --side: #0c0912; --side-ink: #ece8f5; --side-muted: #9a8fb3;
+  --side-hover: #1b1528; --side-active: #2a2040;
   color-scheme: dark;
 }
 
@@ -64,7 +64,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-a { color: var(--pine); text-underline-offset: 3px; }
+a { color: var(--violet); text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--mustard); outline-offset: 2px; }
 
 h1, h2, h3 { font-family: var(--f-head); margin: 0; letter-spacing: -0.015em; }
@@ -169,18 +169,18 @@ h2 { font-size: 1.1rem; font-weight: 650; }
 /* ---------- Pulsanti e form ---------- */
 .btn {
   display: inline-flex; align-items: center; gap: 0.4rem;
-  background: var(--pine); color: var(--pine-ink);
-  border: 1px solid var(--pine); border-radius: 7px;
+  background: var(--violet); color: var(--violet-ink);
+  border: 1px solid var(--violet); border-radius: 7px;
   padding: 0.45rem 0.95rem; font: inherit; font-weight: 600;
   text-decoration: none; cursor: pointer; white-space: nowrap;
 }
 .btn:hover { filter: brightness(1.08); }
-.btn-ghost { background: transparent; color: var(--pine); }
-.btn-ghost:hover { background: var(--pine-soft); filter: none; }
+.btn-ghost { background: transparent; color: var(--violet); }
+.btn-ghost:hover { background: var(--violet-soft); filter: none; }
 .btn-danger { background: transparent; color: var(--neg); border-color: var(--neg); }
 .btn-danger:hover { background: var(--neg-soft); filter: none; }
 .btn-small { padding: 0.25rem 0.6rem; font-size: 0.875rem; }
-.link { background: none; border: 0; padding: 0; font: inherit; color: var(--pine); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--violet); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .link-danger { color: var(--neg); }
 
 label { display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.2rem; }
@@ -190,7 +190,7 @@ input, textarea, select {
   border: 1px solid var(--line); border-radius: 7px;
   padding: 0.42rem 0.6rem;
 }
-input:focus, textarea:focus, select:focus { outline: 2px solid var(--pine); outline-offset: -1px; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--violet); outline-offset: -1px; }
 input.amount-input { width: 6.5rem; padding: 0.25rem 0.45rem; }
 input.amount-input:invalid { border-color: var(--neg); }
 .field { margin-bottom: 1rem; }
@@ -241,7 +241,7 @@ input.amount-input:invalid { border-color: var(--neg); }
 /* ---------- Pipeline ---------- */
 .board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(235px, 1fr); gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
 .column { background: var(--sunken); border-radius: 10px; padding: 0.7rem; min-height: 12rem; border: 2px dashed transparent; }
-.column.over { border-color: var(--pine); }
+.column.over { border-color: var(--violet); }
 .column header { padding: 0 0.2rem 0.6rem; }
 .column header h2 { font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem; }
 .column header .count { font-family: var(--f-body); font-size: 0.75rem; font-weight: 700; min-width: 1.4rem; text-align: center; padding: 0 0.35rem; border-radius: 999px; background: var(--surface); color: var(--muted); }
@@ -283,7 +283,7 @@ input.amount-input:invalid { border-color: var(--neg); }
 .receipt dd { margin: 0; text-align: right; }
 .receipt .total { border-top: 1px dashed var(--line); margin-top: 0.35rem; padding-top: 0.55rem; }
 .receipt dt.total { color: var(--ink); font-weight: 700; align-self: end; }
-.receipt dd.total { font-family: var(--f-head); font-size: 2rem; font-weight: 800; color: var(--pine); letter-spacing: -0.02em; line-height: 1.1; }
+.receipt dd.total { font-family: var(--f-head); font-size: 2rem; font-weight: 800; color: var(--violet); letter-spacing: -0.02em; line-height: 1.1; }
 .receipt .margin { margin-top: 1rem; padding-top: 0.8rem; border-top: 1px dashed var(--line); font-size: 0.9rem; }
 
 /* ---------- Movimento: solo come risposta a un'azione ---------- */

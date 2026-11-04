@@ -1,18 +1,18 @@
 /* Il preventivo da dare al cliente: pulito, si stampa bene su A4 */
-body { font-family: "Figtree", system-ui, sans-serif; color: #1b2321; max-width: 720px; margin: 2.5rem auto; padding: 0 16px; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; }
-header { display: flex; justify-content: space-between; gap: 2rem; padding-bottom: 1rem; border-bottom: 3px solid #1f4a40; }
+body { font-family: "Figtree", system-ui, sans-serif; color: #1e1730; max-width: 720px; margin: 2.5rem auto; padding: 0 16px; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+header { display: flex; justify-content: space-between; gap: 2rem; padding-bottom: 1rem; border-bottom: 3px solid #6d28d9; }
 header p { margin: 0; }
 .right { text-align: right; }
-.shop { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 1.4rem; color: #1f4a40; }
-.to { margin: 2rem 0 0.2rem; color: #5a6965; }
+.shop { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 1.4rem; color: #6d28d9; }
+.to { margin: 2rem 0 0.2rem; color: #6b6380; }
 h1 { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.6rem; margin: 0 0 1.2rem; }
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-size: 0.8rem; color: #5a6965; border-bottom: 1px solid #d2dbd8; padding: 0.4rem 0; }
-td { padding: 0.5rem 0; border-bottom: 1px solid #e6ece9; }
+th { text-align: left; font-size: 0.8rem; color: #6b6380; border-bottom: 1px solid #e2dcef; padding: 0.4rem 0; }
+td { padding: 0.5rem 0; border-bottom: 1px solid #efeaf8; }
 .n { text-align: right; white-space: nowrap; padding-left: 1rem; }
 dl { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 2rem; width: 18rem; margin: 1.5rem 0 0 auto; }
-dt { color: #5a6965; }
+dt { color: #6b6380; }
 dd { margin: 0; text-align: right; }
-.total { font-weight: 800; color: #1b2321; font-size: 1.15rem; border-top: 1px solid #1b2321; padding-top: 0.4rem; }
-.foot { margin-top: 3rem; color: #5a6965; font-size: 0.85rem; }
+.total { font-weight: 800; color: #1e1730; font-size: 1.15rem; border-top: 1px solid #1e1730; padding-top: 0.4rem; }
+.foot { margin-top: 3rem; color: #6b6380; font-size: 0.85rem; }
 @media print { body { margin: 0 auto; } }

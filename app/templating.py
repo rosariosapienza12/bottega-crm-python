@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.cash import MONTH_NAMES
 from app.insights import loyalty_label
-from app.messages import birthday_text, comeback_text
+from app.messages import birthday_text, comeback_text, reminder_text
 from app.money import format_euro
 from app.phone import format_phone, whatsapp_link
 
@@ -69,3 +69,4 @@ templates.env.filters["fedelta"] = loyalty_label
 templates.env.globals["whatsapp_link"] = whatsapp_link
 templates.env.globals["comeback_text"] = comeback_text
 templates.env.globals["birthday_text"] = birthday_text
+templates.env.globals["reminder_text"] = reminder_text

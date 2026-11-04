@@ -141,7 +141,14 @@ Il grafico incassi/spese è un SVG generato da Jinja: nessuna libreria
 JavaScript da caricare e aggiornare, e funziona anche senza JavaScript.
 
 ## Stile
-Verde pino per struttura e azioni, senape per i soldi e le cose da guardare,
-fondo grigio-menta. Bricolage Grotesque per i titoli, Figtree per il testo,
+Viola per struttura e azioni, senape per i soldi e le cose da guardare,
+fondo bianco (prima era verde pino su grigio-menta: cambiato a novembre).
+Verde e rosso restano solo per positivo/negativo. Bricolage Grotesque per i titoli, Figtree per il testo,
 con numeri incolonnati. Una sola cosa "forte" per pagina (il grafico, la
 pipeline, lo scontrino del preventivo), il resto sobrio.
+
+## Promemoria appuntamenti con un link wa.me
+Il messaggio lo prepara Bottega, ma lo invia il titolare dal suo WhatsApp.
+Le API di WhatsApp Business manderebbero tutto in automatico, ma servono un
+account aziendale verificato e si paga ogni messaggio. Così invece è gratis e
+il titolare può ritoccare il testo prima di inviarlo.

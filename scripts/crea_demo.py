@@ -61,10 +61,10 @@ APPOINTMENTS = [
 # (titolo, cliente o None, nome se non è cliente, valore in euro, fase)
 REQUESTS = [
     ("Trucco e acconciatura sposa", None, "Sara (Instagram)", 280, "nuova"),
-    ("Colore per la comunione della figlia", "Francesca", None, 60, "contattata"),
+    ("Colore", "Francesca", None, 60, "contattata"),
     ("Pacchetto 5 pieghe", "Giulia", None, 120, "preventivo"),
     ("Trattamento cheratina", None, "Elena (passaparola)", 150, "nuova"),
-    ("Taglio e barba per il matrimonio", "Luca", None, 45, "confermata"),
+    ("Taglio e barba", "Luca", None, 45, "confermata"),
     ("Extension", None, "Marta", 400, "persa"),
 ]
 

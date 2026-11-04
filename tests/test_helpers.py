@@ -1,6 +1,9 @@
+from datetime import date, datetime
+
 import pytest
 
 from app.insights import loyalty_label, loyalty_score
+from app.messages import reminder_text
 from app.money import format_euro, parse_euro
 from app.phone import format_phone, normalize_phone, whatsapp_link
 
@@ -32,6 +35,27 @@ def test_format_phone():
 def test_whatsapp_link_encodes_the_text():
     link = whatsapp_link("+393331234567", "Ciao Maria, a presto!")
     assert link == "https://wa.me/393331234567?text=Ciao%20Maria%2C%20a%20presto%21"
+
+
+TODAY = date(2026, 11, 4)
+
+
+@pytest.mark.parametrize(
+    "starts_at, service, expected",
+    [
+        (datetime(2026, 11, 4, 9, 30), "Piega",
+         "Ciao Giulia, ti ricordiamo l'appuntamento da Salone Anna oggi alle 09:30 (Piega). A presto!"),
+        (datetime(2026, 11, 5, 17, 0), "Taglio",
+         "Ciao Giulia, ti ricordiamo l'appuntamento da Salone Anna domani alle 17:00 (Taglio). A presto!"),
+        (datetime(2026, 11, 12, 15, 0), "Colore",
+         "Ciao Giulia, ti ricordiamo l'appuntamento da Salone Anna il 12/11 alle 15:00 (Colore). A presto!"),
+        # Senza servizio niente parentesi vuote
+        (datetime(2026, 11, 5, 17, 0), None,
+         "Ciao Giulia, ti ricordiamo l'appuntamento da Salone Anna domani alle 17:00. A presto!"),
+    ],
+)
+def test_reminder_text(starts_at, service, expected):
+    assert reminder_text("Giulia", "Salone Anna", starts_at, service, today=TODAY) == expected
 
 
 @pytest.mark.parametrize(
