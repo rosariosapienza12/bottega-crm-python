@@ -3,7 +3,7 @@ import os
 # Prima di importare l'app: configurazione finta, il .env vero non viene letto
 os.environ["BOTTEGA_ENV_FILE"] = "file-che-non-esiste.env"
 os.environ["DATABASE_URL"] = "sqlite://"
-os.environ["SECRET_KEY"] = "chiave-finta-solo-per-i-test"
+os.environ["SECRET_KEY"] = "chiave-finta-solo-per-i-test-lunga-abbastanza"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

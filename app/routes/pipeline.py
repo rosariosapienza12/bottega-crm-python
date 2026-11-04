@@ -1,5 +1,6 @@
 """Pipeline delle richieste: colonne per fase, con trascinamento."""
 
+import re
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -38,9 +39,15 @@ def get_request(db: Session, user: User, request_id: int) -> PipelineRequest:
     return item
 
 
+# Solo cifre 0-9, al massimo 9: isdigit() accetterebbe anche "²", che poi
+# int() rifiuta con un errore 500, e un numero enorme manderebbe in errore il database
+PLAIN_ID = re.compile(r"[0-9]{1,9}")
+
+
 def owned_customer_id(db: Session, user: User, raw: str) -> int | None:
     """L'id del cliente scelto nel form, solo se è di questa attività."""
-    if not raw.strip().isdigit():
+    raw = raw.strip()
+    if not PLAIN_ID.fullmatch(raw):
         return None
     customer_id = int(raw)
     owned = db.scalar(
@@ -159,7 +166,7 @@ def move_request(
     item = get_request(db, user, request_id)
     item.stage = stage
 
-    ids = [int(part) for part in order.split(",") if part.strip().isdigit()][:500]
+    ids = [int(part) for part in order.split(",") if PLAIN_ID.fullmatch(part.strip())][:500]
     if item.id not in ids:
         ids.append(item.id)
     # Solo le richieste di questa attività: un id estraneo nella lista viene ignorato
