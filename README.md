@@ -123,8 +123,9 @@ touch your `.env` or `bottega.db`.
 - Every query is filtered by the logged-in business; tests try to read and
   change another business's data and expect 404.
 - CSRF: SameSite cookie plus an Origin/Referer check on every POST.
-- Strict Content-Security-Policy (no inline scripts), subresource integrity
-  on CDN scripts, `X-Frame-Options`, `no-store` on private pages.
+- Strict Content-Security-Policy: scripts only from the site itself (Tailwind
+  and htmx are vendored, no CDN, no inline scripts), `X-Frame-Options`,
+  `no-store` on private pages.
 - Secrets only in `.env`, never committed; `SECRET_KEY` is a `SecretStr`.
 - User input in WhatsApp links is URL-encoded and HTML-escaped; a test
   saves a customer whose name contains a `<script>` tag and checks that it

@@ -68,9 +68,19 @@ def test_script_in_a_request_title_is_not_executed(logged_in):
 
 def test_security_headers(client):
     headers = client.get("/").headers
-    assert "script-src 'self' https://cdn.jsdelivr.net/npm/@tailwindcss" in headers["Content-Security-Policy"]
-    assert "'unsafe-inline'" not in headers["Content-Security-Policy"].split("script-src")[1].split(";")[0]
+    # Script solo dal nostro sito: nessun CDN, niente script inline
+    assert "script-src 'self';" in headers["Content-Security-Policy"]
+    assert "cdn.jsdelivr.net" not in headers["Content-Security-Policy"]
     assert headers["X-Frame-Options"] == "DENY"
+
+
+def test_libraries_are_served_by_the_site(client):
+    page = client.get("/").text
+
+    for path in ("/static/vendor/tailwindcss-browser-4.1.11.js", "/static/vendor/htmx-2.0.4.min.js"):
+        assert f'src="{path}"' in page
+        assert client.get(path).status_code == 200
+    assert "cdn.jsdelivr.net" not in page
 
 
 @pytest.fixture

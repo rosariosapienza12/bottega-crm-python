@@ -89,11 +89,14 @@ con pytest. Quando un'azione deve aggiornare un'altra parte della pagina
 `HX-Trigger: visitsChanged`.
 
 ## Header di sicurezza
-Content-Security-Policy: script solo dal sito e dai due file del CDN che
-usiamo, niente iframe. In più `X-Content-Type-Options: nosniff` e
+Content-Security-Policy: script solo dal sito, niente iframe. In più `X-Content-Type-Options: nosniff` e
 `Referrer-Policy`. La documentazione automatica di FastAPI (`/docs`) è
 spenta: non serve a chi usa l'app e mostrerebbe tutte le rotte.
-Tailwind dal CDN va bene solo in sviluppo: in produzione si compila.
+Tailwind e htmx sono copiati in `app/static/vendor` invece di arrivare da un
+CDN: il sito non dipende da un server esterno, e con un CDN l'hash di
+integrità (SRI) andava tenuto allineato al file servito, cosa che non si
+riesce a verificare senza scaricarlo. Tailwind gira ancora nel browser: la
+versione compilata sarebbe più leggera ma richiede Node per la build.
 
 ## Punteggio fedeltà
 Da 0 a 100: 60 punti per la frequenza (una visita al mese = pieno) e 40 per

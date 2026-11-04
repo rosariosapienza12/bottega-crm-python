@@ -13,12 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/static/style.css">
-  <!-- integrity: se il file sul CDN venisse alterato, il browser non lo esegue.
-       Tailwind dal CDN va bene in sviluppo, in produzione va compilato. -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"
-          integrity="sha384-A1XhMANHciQ8ED89Ap5K0zOdmQKiEeXSjaN0sakNxIzq9Z2YfXV/BwHp7oP3z5ip" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"
-          integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous" defer></script>
+  <!-- Librerie copiate nel sito (app/static/vendor), non caricate da un CDN:
+       la pagina non dipende da un server esterno. -->
+  <script src="/static/vendor/tailwindcss-browser-4.1.11.js"></script>
+  <script src="/static/vendor/htmx-2.0.4.min.js" defer></script>
   <script src="/static/app.js" defer></script>
 </head>
 <body>
