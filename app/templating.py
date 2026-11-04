@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi.templating import Jinja2Templates
 
 from app.cash import MONTH_NAMES
+from app.config import settings
 from app.insights import loyalty_label
 from app.messages import birthday_text, comeback_text, reminder_text
 from app.money import format_euro
@@ -70,3 +71,5 @@ templates.env.globals["whatsapp_link"] = whatsapp_link
 templates.env.globals["comeback_text"] = comeback_text
 templates.env.globals["birthday_text"] = birthday_text
 templates.env.globals["reminder_text"] = reminder_text
+# Funzione e non valore fisso: si legge l'impostazione ogni volta (i test la cambiano)
+templates.env.globals["demo_mode"] = lambda: settings.demo_mode

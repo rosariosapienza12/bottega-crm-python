@@ -68,9 +68,19 @@ def test_script_in_a_request_title_is_not_executed(logged_in):
 
 def test_security_headers(client):
     headers = client.get("/").headers
-    assert "script-src 'self' https://cdn.jsdelivr.net/npm/@tailwindcss" in headers["Content-Security-Policy"]
-    assert "'unsafe-inline'" not in headers["Content-Security-Policy"].split("script-src")[1].split(";")[0]
+    # Script solo dal nostro sito: nessun CDN, niente script inline
+    assert "script-src 'self';" in headers["Content-Security-Policy"]
+    assert "cdn.jsdelivr.net" not in headers["Content-Security-Policy"]
     assert headers["X-Frame-Options"] == "DENY"
+
+
+def test_libraries_are_served_by_the_site(client):
+    page = client.get("/").text
+
+    for path in ("/static/vendor/tailwindcss-browser-4.1.11.js", "/static/vendor/htmx-2.0.4.min.js"):
+        assert f'src="{path}"' in page
+        assert client.get(path).status_code == 200
+    assert "cdn.jsdelivr.net" not in page
 
 
 @pytest.fixture
@@ -178,3 +188,61 @@ def test_absurd_date_in_a_form_is_rejected_before_saving(logged_in, db):
     )
     assert response.status_code == 422
     assert db.scalars(select(Movement)).first() is None
+
+
+# --- Configurazione e input strani ---
+
+
+@pytest.mark.parametrize("weak_key", ["corta", "cambiami-con-una-stringa-casuale"])
+def test_app_refuses_a_weak_or_example_secret_key(weak_key):
+    from pydantic import ValidationError
+
+    from app.config import Settings
+
+    # Con la chiave d'esempio (pubblica su GitHub) chiunque firmerebbe cookie finti
+    with pytest.raises(ValidationError, match="SECRET_KEY"):
+        Settings(database_url="sqlite://", secret_key=weak_key)
+
+
+def test_demo_script_refuses_a_production_database():
+    from scripts.crea_demo import check_local_database
+
+    check_local_database("sqlite:///bottega.db")  # in locale va bene
+    with pytest.raises(SystemExit):
+        check_local_database("postgresql://utente@server/bottega")
+
+
+@pytest.mark.parametrize("strange_id", ["²", "9" * 30, "-1", "1e3"])
+def test_strange_customer_id_in_a_form_is_ignored(logged_in, db, strange_id):
+    # "²" passa isdigit() ma int() lo rifiuta: prima diventava un errore 500
+    response = logged_in.post(
+        "/richieste",
+        data={"title": "Colore", "contact_name": "Sara", "value": "100", "customer_id": strange_id},
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == 200
+    item = db.scalars(select(PipelineRequest)).one()
+    assert item.customer_id is None
+
+
+def test_strange_quantity_in_stock_is_refused(logged_in, db):
+    response = logged_in.post(
+        "/magazzino",
+        data={"name": "Tinta", "unit": "pz", "quantity": "²", "min_quantity": "0", "cost": "1"},
+    )
+
+    assert response.status_code != 500
+    assert db.scalars(select(Product)).first() is None
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["postgresql://u:p@db.example.com/crm?sslmode=require", "postgres://u:p@db.example.com/crm?sslmode=require"],
+)
+def test_postgres_urls_use_psycopg_driver(url):
+    from app.config import Settings
+
+    settings = Settings(database_url=url, secret_key="x" * 32)
+
+    assert settings.database_url == "postgresql+psycopg://u:p@db.example.com/crm?sslmode=require"

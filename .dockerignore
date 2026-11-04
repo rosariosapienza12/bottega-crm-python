@@ -1,0 +1,13 @@
+# File che non devono finire nell'immagine Docker
+.env
+.env.*
+*.db
+*.sqlite3
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.git/
+.vscode/
+.idea/

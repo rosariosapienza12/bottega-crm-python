@@ -8,6 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MIN_SECRET_LENGTH = 32
+# Il valore di esempio scritto in .env.example
+PLACEHOLDER_SECRET = "cambiami-con-una-stringa-casuale"
+
 
 class Settings(BaseSettings):
     # I test impostano BOTTEGA_ENV_FILE su un file che non esiste,
@@ -22,6 +26,36 @@ class Settings(BaseSettings):
     secret_key: SecretStr
     # In produzione va messo a true: il cookie di login viaggia solo su HTTPS
     session_https_only: bool = False
+    # Solo per la demo pubblica: pulsante "Prova la demo" e avviso sui dati di prova
+    demo_mode: bool = False
+    # Dietro un proxy che sovrascrive X-Forwarded-For con l'IP vero del visitatore
+    # (Vercel lo fa): senza, tutti avrebbero l'IP del proxy. Mai true se il sito è
+    # raggiungibile direttamente, perché quell'header lo può scrivere chiunque
+    trust_forwarded_for: bool = False
+    # Su Vercel non c'è un momento "prima dell'avvio" per le migrazioni: le fa l'app
+    migrate_on_startup: bool = False
+
+    @field_validator("secret_key")
+    @classmethod
+    def reject_weak_secret(cls, key: SecretStr) -> SecretStr:
+        # Con una chiave corta o copiata da .env.example (che è pubblico su GitHub)
+        # chiunque potrebbe firmare un cookie finto ed entrare come un altro utente
+        value = key.get_secret_value()
+        if value == PLACEHOLDER_SECRET or len(value) < MIN_SECRET_LENGTH:
+            raise ValueError(
+                f"SECRET_KEY deve essere casuale e lunga almeno {MIN_SECRET_LENGTH} caratteri"
+            )
+        return key
+
+    @field_validator("database_url")
+    @classmethod
+    def use_psycopg_driver(cls, url: str) -> str:
+        # Neon e gli altri servizi danno indirizzi "postgresql://" (o "postgres://"):
+        # SQLAlchemy li userebbe con il vecchio driver psycopg2, noi usiamo psycopg 3
+        for prefix in ("postgresql://", "postgres://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url.removeprefix(prefix)
+        return url
 
     @field_validator("database_url")
     @classmethod

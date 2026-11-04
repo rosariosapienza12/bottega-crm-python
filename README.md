@@ -44,21 +44,51 @@ Bottega is a learning project, built step by step.
 
 The interface is in Italian, since it is meant for small businesses in Italy.
 
-Still to do: an AI-generated summary of a customer's history, deployment
-with Docker and PostgreSQL.
+Still to do: an AI-generated summary of a customer's history.
+
+## Online demo
+
+The online version runs for free on [Vercel](https://vercel.com) with a
+[Neon](https://neon.tech) PostgreSQL database, in **demo mode**
+(`DEMO_MODE=true`): the "Prova la demo" button gives every visitor a private
+sample business, full of customers, visits, appointments, quotes and stock.
+Nobody sees anyone else's changes, and demo businesses are deleted with all
+their data after 24 hours. Demo accounts use the reserved `.invalid` domain and
+a random password nobody knows, so they can only be entered through the button.
+
+To deploy:
+
+1. Create a free project on Neon and copy its connection string (with
+   connection pooling switched off).
+2. On Vercel choose **Add New → Project**, import this repository (Vercel
+   detects the FastAPI `app` in `app/main.py`) and set these environment
+   variables:
+
+   | Variable | Value |
+   | --- | --- |
+   | `DATABASE_URL` | the Neon connection string |
+   | `SECRET_KEY` | 32+ random characters |
+   | `DEMO_MODE` | `true` |
+   | `MIGRATE_ON_STARTUP` | `true` (the app creates and updates its tables) |
+   | `SESSION_HTTPS_ONLY` | `true` |
+   | `TRUST_FORWARDED_FOR` | `true` (Vercel puts the real client IP in `X-Forwarded-For`) |
+
+3. Deploy.
+
+The `Dockerfile` runs the same app on any server with Docker.
 
 ## Tech stack
 
 Python, FastAPI, SQLAlchemy and Alembic. SQLite in development, PostgreSQL
-planned for production. Server-rendered Jinja2 templates with HTMX for the
+(psycopg 3) online. Server-rendered Jinja2 templates with HTMX for the
 interactive parts and Tailwind CSS. Passwords hashed with Argon2. Tests with
 pytest.
 
 ## Running it locally (Windows / PowerShell)
 
 ```powershell
-git clone https://github.com/rosariosapienza12/bottega-crm-python.git
-cd bottega-crm-python
+git clone https://github.com/rosariosapienza12/crm-piccola-attivita.git
+cd crm-piccola-attivita
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -101,8 +131,9 @@ touch your `.env` or `bottega.db`.
 - Every query is filtered by the logged-in business; tests try to read and
   change another business's data and expect 404.
 - CSRF: SameSite cookie plus an Origin/Referer check on every POST.
-- Strict Content-Security-Policy (no inline scripts), subresource integrity
-  on CDN scripts, `X-Frame-Options`, `no-store` on private pages.
+- Strict Content-Security-Policy: scripts only from the site itself (Tailwind
+  and htmx are vendored, no CDN, no inline scripts), `X-Frame-Options`,
+  `no-store` on private pages.
 - Secrets only in `.env`, never committed; `SECRET_KEY` is a `SecretStr`.
 - User input in WhatsApp links is URL-encoded and HTML-escaped; a test
   saves a customer whose name contains a `<script>` tag and checks that it

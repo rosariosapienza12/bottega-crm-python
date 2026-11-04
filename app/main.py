@@ -13,15 +13,13 @@ from app.deps import LoginRequired
 from app.routes import agenda, auth, cash, customers, inventory, overview, pipeline, quotes
 from app.templating import templates
 
-# Script solo da qui e dai due file del CDN che usiamo (non da tutto jsdelivr),
+# Script solo dal nostro sito (anche Tailwind e htmx sono in app/static/vendor),
 # font da Google Fonts, niente iframe da altri siti. 'unsafe-inline' sugli stili
 # serve a Tailwind, che li genera nella pagina. Gli script non hanno 'unsafe-inline':
 # un <script> iniettato da un attaccante non parte.
 CONTENT_SECURITY_POLICY = (
     "default-src 'self'; "
-    "script-src 'self' "
-    "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11 "
-    "https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js; "
+    "script-src 'self'; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "font-src https://fonts.gstatic.com; "
     "img-src 'self' data:; "
@@ -33,6 +31,12 @@ CONTENT_SECURITY_POLICY = (
 )
 
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+
+if settings.migrate_on_startup:
+    # Prima di accettare richieste il database deve avere tutte le tabelle
+    from app.migrate import upgrade_database
+
+    upgrade_database()
 
 app = FastAPI(title="Bottega", docs_url=None, redoc_url=None, openapi_url=None)
 

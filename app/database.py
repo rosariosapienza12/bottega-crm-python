@@ -11,7 +11,12 @@ is_sqlite = settings.database_url.startswith("sqlite")
 # aperta, e SQLite di default non lo permette
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-engine = create_engine(settings.database_url, connect_args=connect_args)
+# Con PostgreSQL online (Neon) il database va "a riposo" quando nessuno lo usa:
+# pool_pre_ping controlla che la connessione sia ancora viva prima di usarla,
+# pool_recycle la rinnova dopo 5 minuti invece di tenerla aperta per sempre
+pool_options = {} if is_sqlite else {"pool_pre_ping": True, "pool_recycle": 300}
+
+engine = create_engine(settings.database_url, connect_args=connect_args, **pool_options)
 
 if is_sqlite:
 

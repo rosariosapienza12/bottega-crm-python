@@ -89,11 +89,14 @@ con pytest. Quando un'azione deve aggiornare un'altra parte della pagina
 `HX-Trigger: visitsChanged`.
 
 ## Header di sicurezza
-Content-Security-Policy: script solo dal sito e dai due file del CDN che
-usiamo, niente iframe. In più `X-Content-Type-Options: nosniff` e
+Content-Security-Policy: script solo dal sito, niente iframe. In più `X-Content-Type-Options: nosniff` e
 `Referrer-Policy`. La documentazione automatica di FastAPI (`/docs`) è
 spenta: non serve a chi usa l'app e mostrerebbe tutte le rotte.
-Tailwind dal CDN va bene solo in sviluppo: in produzione si compila.
+Tailwind e htmx sono copiati in `app/static/vendor` invece di arrivare da un
+CDN: il sito non dipende da un server esterno, e con un CDN l'hash di
+integrità (SRI) andava tenuto allineato al file servito, cosa che non si
+riesce a verificare senza scaricarlo. Tailwind gira ancora nel browser: la
+versione compilata sarebbe più leggera ma richiede Node per la build.
 
 ## Punteggio fedeltà
 Da 0 a 100: 60 punti per la frequenza (una visita al mese = pieno) e 40 per
@@ -160,3 +163,37 @@ riquadro in cui si trova, non quella dello schermo. Così passa su due righe
 (ora, cliente e servizio sopra, pulsanti sotto) sia su telefono sia nel
 riquadro stretto "Oggi" della Panoramica su computer. Una media query avrebbe
 sistemato solo il telefono.
+
+## Demo online gratuita su Vercel, con PostgreSQL su Neon
+All'inizio avevo preparato Render, ma il server gratuito si spegne dopo 15
+minuti e la prima pagina ci metteva fino a un minuto: per un link nel
+curriculum è una brutta prima impressione. Vercel (gratis per i progetti
+personali) non si spegne e ospita anche Lumora: un solo servizio per tutti e
+due i progetti. Su Vercel il disco non resta, quindi il database è
+PostgreSQL su Neon (gratis), con il driver psycopg 3.
+
+Con un database che resta, un unico account demo condiviso si "sporcherebbe"
+con le prove di tutti. Allora ogni clic su "Prova la demo" crea un'attività di
+prova nuova, solo per quel visitatore (app/demo.py), e quelle di più di 24 ore
+si cancellano con tutti i dati. Gli account demo hanno un indirizzo sul dominio
+riservato `.invalid` e una password casuale: non si può entrare dal login.
+Lo script `crea_demo` con la password pubblica resta solo per il PC (SQLite).
+
+Su Vercel non c'è un momento "prima dell'avvio" per lanciare le migrazioni:
+con `MIGRATE_ON_STARTUP=true` le fa l'app quando si accende. Con PostgreSQL un
+advisory lock fa aspettare le altre copie dell'app, così non si pestano i piedi.
+Le date sono in UTC: Neon usa UTC di default.
+
+`TRUST_FORWARDED_FOR=true` legge l'IP del visitatore da `X-Forwarded-For`: va
+bene solo dietro Vercel, che sovrascrive quell'header. Su un server
+raggiungibile direttamente chiunque potrebbe scriverlo e fingersi un altro IP.
+Il limite dei tentativi di login resta in memoria, quindi vale per ogni copia
+dell'app separatamente: per una demo basta.
+
+Il Dockerfile resta per chi vuole far girare l'app su un server suo.
+
+## La SECRET_KEY viene controllata all'avvio
+Con la chiave d'esempio di `.env.example` (pubblica su GitHub) o una chiave
+corta, chiunque potrebbe firmare un cookie finto ed entrare come un altro
+utente. Per questo l'app si rifiuta di partire se la chiave ha meno di 32
+caratteri o è quella d'esempio. Meglio un errore subito che un sito insicuro.

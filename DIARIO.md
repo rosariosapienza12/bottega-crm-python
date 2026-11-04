@@ -111,3 +111,58 @@ Cosa ho imparato:
 - Cos'è una container query e la differenza con una media query.
 - X-Frame-Options impedisce di mostrare le pagine dentro un iframe: è una
   difesa contro il clickjacking.
+
+Sera:
+
+- Revisione di sicurezza prima di mettere l'app online. Corretti tre punti:
+  l'app non parte con una SECRET_KEY debole o d'esempio, lo script della demo
+  funziona solo su SQLite, e gli id nei form accettano solo cifre 0-9.
+- Modalità demo: pulsante "Prova la demo" e striscia che avvisa che i dati
+  sono finti. Senza DEMO_MODE la rotta /demo risponde 404.
+- Dockerfile, script di avvio e render.yaml per la demo gratuita su Render.
+  Immagine provata: parte, carica i dati di prova e gira senza root.
+- 151 test in tutto.
+
+Cosa ho imparato:
+- "²".isdigit() è vero ma int("²") va in errore: per i numeri meglio una
+  regex con [0-9].
+- Un test che prima di una correzione fallisce e dopo passa dimostra che la
+  correzione serve davvero.
+- Dietro un proxy l'app vede l'IP del proxy, non quello del visitatore:
+  serve --proxy-headers, e bisogna dire di quali proxy fidarsi.
+- Nel Dockerfile si copia prima requirements.txt e poi il codice, così Docker
+  riusa le librerie già installate quando cambia solo il codice.
+
+Ancora:
+
+- Tailwind e htmx ora sono file del sito (app/static/vendor) e non arrivano
+  più da un CDN. Nel mio ambiente di prova il CDN era bloccato e le pagine
+  sembravano rotte da telefono: con le librerie vere tutte le pagine stanno
+  nello schermo e le tabelle scorrono dentro il loro riquadro.
+- Da telefono il menu va a capo su due righe: prima "Preventivi", "Cassa" e
+  "Magazzino" erano nascosti in una striscia da scorrere.
+
+Cosa ho imparato:
+- Prima di correggere un "bug" bisogna essere sicuri di misurare la cosa
+  giusta: il problema era nell'ambiente di prova, non nell'app.
+- Copiare una libreria nel progetto ("vendoring") toglie una dipendenza
+  esterna; in cambio va aggiornata a mano.
+
+Notte:
+
+- Niente Render: la demo andrà su Vercel con il database PostgreSQL su Neon,
+  come Lumora. Il CRM ora parla con PostgreSQL (psycopg 3) e le migrazioni
+  le fa l'app all'avvio.
+- La demo è diventata personale: ogni visitatore riceve il suo Salone di
+  prova, che si cancella dopo 24 ore. Provato su PostgreSQL vero: due
+  visitatori non si vedono a vicenda e la pulizia cancella tutto.
+- Tolto render.yaml. 159 test, passano anche con Python 3.12 (quello di
+  Vercel).
+
+Cosa ho imparato:
+- Un database che "resta" cambia il modo di fare una demo: con SQLite che si
+  azzera bastava un account condiviso, con PostgreSQL serve un'attività per
+  visitatore.
+- Un advisory lock di PostgreSQL è un lucchetto con un numero come nome:
+  chi arriva secondo aspetta.
+- Il dominio .invalid è riservato: nessuna email ci può arrivare.

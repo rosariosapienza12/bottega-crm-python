@@ -3,14 +3,16 @@
 from typing import Annotated
 
 from email_validator import EmailNotValidError, validate_email
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.config import settings
 from app.deps import DbSession
+from app.demo import create_demo_account, purge_expired_demos
 from app.models import Business, User
-from app.ratelimit import ip_limiter, login_limiter, signup_limiter
+from app.ratelimit import demo_limiter, ip_limiter, login_limiter, signup_limiter
 from app.security import hash_password, verify_password
 from app.templating import templates
 
@@ -34,6 +36,11 @@ def start_session(request: Request, user: User) -> RedirectResponse:
 
 
 def client_ip(request: Request) -> str:
+    if settings.trust_forwarded_for:
+        # Vercel scrive qui l'IP vero del visitatore, sovrascrivendo quello che manda il browser
+        forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        if forwarded:
+            return forwarded[:64]
     return request.client.host if request.client else "sconosciuto"
 
 
@@ -128,6 +135,22 @@ def login(
 
     login_limiter.reset(pair_key)
     return start_session(request, user)
+
+
+@router.post("/demo")
+def demo_login(request: Request, db: DbSession):
+    """Crea un'attività di prova solo per questo visitatore ed entra: esiste solo nella demo online."""
+    if not settings.demo_mode:
+        raise HTTPException(status_code=404)
+    ip_key = f"ip:{client_ip(request)}"
+    if demo_limiter.is_blocked(ip_key):
+        context = {"error": "Troppe demo da questa rete. Riprova tra un'ora."}
+        return templates.TemplateResponse(request, "auth/login.html", context, status_code=429)
+    demo_limiter.record(ip_key)
+
+    # Pulizia: le attività demo di più di 24 ore se ne vanno con tutti i loro dati
+    purge_expired_demos(db)
+    return start_session(request, create_demo_account(db))
 
 
 @router.post("/esci")

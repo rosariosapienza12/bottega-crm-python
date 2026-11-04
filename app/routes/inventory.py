@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.deps import CurrentUser, DbSession
 from app.models import Product, User
 from app.money import parse_euro
+from app.routes.pipeline import PLAIN_ID
 from app.templating import templates
 
 router = APIRouter(prefix="/magazzino")
@@ -37,7 +38,7 @@ def read_product_form(name: str, unit: str, quantity: str, min_quantity: str, co
     if not name or len(name) > 100 or len(unit) > 20:
         raise ValueError("Scrivi il nome del prodotto (massimo 100 caratteri).")
     numbers = (quantity.strip() or "0", min_quantity.strip() or "0")
-    if not all(n.isdigit() and int(n) <= MAX_QUANTITY for n in numbers):
+    if not all(PLAIN_ID.fullmatch(n) and int(n) <= MAX_QUANTITY for n in numbers):
         raise ValueError("Quantità e scorta minima sono numeri interi.")
     try:
         cost_cents = parse_euro(cost)

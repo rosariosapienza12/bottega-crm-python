@@ -9,10 +9,13 @@
         appuntamenti, preventivi, cassa e magazzino nello stesso posto, e ogni
         mattina ti dice chi non passa da un po' e chi compie gli anni.
       </p>
-      <p class="mt-7 flex flex-wrap gap-3">
-        <a class="btn" href="/registrati">Registra la tua attività</a>
+      <div class="mt-7 flex flex-wrap gap-3">
+        {% if demo_mode() %}
+          <form method="post" action="/demo"><button class="btn">Prova la demo</button></form>
+        {% endif %}
+        <a class="btn{% if demo_mode() %} btn-ghost{% endif %}" href="/registrati">Registra la tua attività</a>
         <a class="btn btn-ghost" href="/accedi">Accedi</a>
-      </p>
+      </div>
     </div>
 
     {# Un'anteprima di come appare una mattina in Panoramica: dati di esempio #}

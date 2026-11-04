@@ -5,6 +5,12 @@
 {% block public %}
   <div class="panel max-w-sm">
     <h1>Accedi</h1>
+    {% if demo_mode() %}
+      <form method="post" action="/demo" class="mt-4">
+        <button class="btn">Prova la demo, senza registrarti</button>
+      </form>
+      <p class="mt-4 text-sm muted">Oppure accedi con il tuo account:</p>
+    {% endif %}
 
     {% if error %}<p class="alert mt-4" role="alert">{{ error }}</p>{% endif %}
 
