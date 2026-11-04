@@ -22,6 +22,9 @@
   <script src="/static/app.js" defer></script>
 </head>
 <body>
+{% if demo_mode() %}
+  <p class="demo-banner" role="note">Questa è una demo: i dati sono di prova e si azzerano ogni volta che il server si riavvia.</p>
+{% endif %}
 {% if user %}
   {% set path = request.url.path %}
   {% macro nav_link(href, label, icon) %}

@@ -303,3 +303,13 @@ input.amount-input:invalid { border-color: var(--neg); }
   .no-print { display: none !important; }
   body { background: #fff; color: #000; }
 }
+
+/* Striscia in cima alla demo online: dice che i dati sono finti */
+.demo-banner {
+  margin: 0;
+  padding: .5rem 1rem;
+  background: var(--violet-soft);
+  color: var(--ink);
+  font-size: .875rem;
+  text-align: center;
+}

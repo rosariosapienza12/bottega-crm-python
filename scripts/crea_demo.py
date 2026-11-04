@@ -31,9 +31,9 @@ from app.models import (
     Visit,
 )
 from app.quotes import compute_totals
+from app.routes.auth import DEMO_EMAIL
 from app.security import hash_password
 
-DEMO_EMAIL = "demo@bottega.test"
 DEMO_PASSWORD = "prova-bottega-2026"
 
 # (nome, cognome, telefono, compleanno tra N giorni o None, note,

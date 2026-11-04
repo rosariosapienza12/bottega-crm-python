@@ -3,11 +3,12 @@
 from typing import Annotated
 
 from email_validator import EmailNotValidError, validate_email
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.config import settings
 from app.deps import DbSession
 from app.models import Business, User
 from app.ratelimit import ip_limiter, login_limiter, signup_limiter
@@ -15,6 +16,9 @@ from app.security import hash_password, verify_password
 from app.templating import templates
 
 router = APIRouter()
+
+# L'account creato da scripts/crea_demo.py
+DEMO_EMAIL = "demo@bottega.test"
 
 MIN_PASSWORD_LENGTH = 8
 # Un limite in alto serve solo a non far calcolare l'hash di testi enormi
@@ -127,6 +131,17 @@ def login(
         return templates.TemplateResponse(request, "auth/login.html", context, status_code=400)
 
     login_limiter.reset(pair_key)
+    return start_session(request, user)
+
+
+@router.post("/demo")
+def demo_login(request: Request, db: DbSession):
+    """Entra nell'attività di prova senza password: esiste solo nella demo online."""
+    if not settings.demo_mode:
+        raise HTTPException(status_code=404)
+    user = db.scalar(select(User).where(User.email == DEMO_EMAIL))
+    if user is None:
+        return RedirectResponse("/accedi", status_code=303)
     return start_session(request, user)
 
 
