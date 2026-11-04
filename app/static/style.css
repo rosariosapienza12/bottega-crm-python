@@ -109,7 +109,8 @@ h2 { font-size: 1.1rem; font-weight: 650; }
      invece di farlo scorrere, e tutta la pagina va fuori dallo schermo */
   .app { grid-template-columns: minmax(0, 1fr); }
   .side { min-width: 0; position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: 0.7rem 16px; }
-  .side nav { flex-direction: row; overflow-x: auto; width: 100%; order: 3; }
+  /* Le 7 voci vanno a capo: una striscia che scorre nasconderebbe le ultime */
+  .side nav { flex-direction: row; flex-wrap: wrap; gap: 2px 4px; width: 100%; order: 3; }
   .side nav a { white-space: nowrap; }
   .side nav svg { display: none; }
   .side .foot { margin: 0 0 0 auto; flex-direction: row; gap: 1rem; }

@@ -132,3 +132,18 @@ Cosa ho imparato:
   serve --proxy-headers, e bisogna dire di quali proxy fidarsi.
 - Nel Dockerfile si copia prima requirements.txt e poi il codice, così Docker
   riusa le librerie già installate quando cambia solo il codice.
+
+Ancora:
+
+- Tailwind e htmx ora sono file del sito (app/static/vendor) e non arrivano
+  più da un CDN. Nel mio ambiente di prova il CDN era bloccato e le pagine
+  sembravano rotte da telefono: con le librerie vere tutte le pagine stanno
+  nello schermo e le tabelle scorrono dentro il loro riquadro.
+- Da telefono il menu va a capo su due righe: prima "Preventivi", "Cassa" e
+  "Magazzino" erano nascosti in una striscia da scorrere.
+
+Cosa ho imparato:
+- Prima di correggere un "bug" bisogna essere sicuri di misurare la cosa
+  giusta: il problema era nell'ambiente di prova, non nell'app.
+- Copiare una libreria nel progetto ("vendoring") toglie una dipendenza
+  esterna; in cambio va aggiornata a mano.
