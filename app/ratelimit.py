@@ -52,3 +52,5 @@ login_limiter = AttemptLimiter(max_attempts=5)
 ip_limiter = AttemptLimiter(max_attempts=20)
 # Registrazioni: ognuna costa un hash Argon2, non lasciamo che un bot ne faccia mille
 signup_limiter = AttemptLimiter(max_attempts=10, window=60 * 60)
+# Attività demo nuove per IP in un'ora: ognuna occupa spazio nel database per 24 ore
+demo_limiter = AttemptLimiter(max_attempts=10, window=60 * 60)

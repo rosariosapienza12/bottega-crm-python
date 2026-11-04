@@ -10,15 +10,13 @@ from sqlalchemy.exc import IntegrityError
 
 from app.config import settings
 from app.deps import DbSession
+from app.demo import create_demo_account, purge_expired_demos
 from app.models import Business, User
-from app.ratelimit import ip_limiter, login_limiter, signup_limiter
+from app.ratelimit import demo_limiter, ip_limiter, login_limiter, signup_limiter
 from app.security import hash_password, verify_password
 from app.templating import templates
 
 router = APIRouter()
-
-# L'account creato da scripts/crea_demo.py
-DEMO_EMAIL = "demo@bottega.test"
 
 MIN_PASSWORD_LENGTH = 8
 # Un limite in alto serve solo a non far calcolare l'hash di testi enormi
@@ -38,6 +36,11 @@ def start_session(request: Request, user: User) -> RedirectResponse:
 
 
 def client_ip(request: Request) -> str:
+    if settings.trust_forwarded_for:
+        # Vercel scrive qui l'IP vero del visitatore, sovrascrivendo quello che manda il browser
+        forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        if forwarded:
+            return forwarded[:64]
     return request.client.host if request.client else "sconosciuto"
 
 
@@ -136,13 +139,18 @@ def login(
 
 @router.post("/demo")
 def demo_login(request: Request, db: DbSession):
-    """Entra nell'attività di prova senza password: esiste solo nella demo online."""
+    """Crea un'attività di prova solo per questo visitatore ed entra: esiste solo nella demo online."""
     if not settings.demo_mode:
         raise HTTPException(status_code=404)
-    user = db.scalar(select(User).where(User.email == DEMO_EMAIL))
-    if user is None:
-        return RedirectResponse("/accedi", status_code=303)
-    return start_session(request, user)
+    ip_key = f"ip:{client_ip(request)}"
+    if demo_limiter.is_blocked(ip_key):
+        context = {"error": "Troppe demo da questa rete. Riprova tra un'ora."}
+        return templates.TemplateResponse(request, "auth/login.html", context, status_code=429)
+    demo_limiter.record(ip_key)
+
+    # Pulizia: le attività demo di più di 24 ore se ne vanno con tutti i loro dati
+    purge_expired_demos(db)
+    return start_session(request, create_demo_account(db))
 
 
 @router.post("/esci")

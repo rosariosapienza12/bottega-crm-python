@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     session_https_only: bool = False
     # Solo per la demo pubblica: pulsante "Prova la demo" e avviso sui dati di prova
     demo_mode: bool = False
+    # Dietro un proxy che sovrascrive X-Forwarded-For con l'IP vero del visitatore
+    # (Vercel lo fa): senza, tutti avrebbero l'IP del proxy. Mai true se il sito è
+    # raggiungibile direttamente, perché quell'header lo può scrivere chiunque
+    trust_forwarded_for: bool = False
+    # Su Vercel non c'è un momento "prima dell'avvio" per le migrazioni: le fa l'app
+    migrate_on_startup: bool = False
 
     @field_validator("secret_key")
     @classmethod

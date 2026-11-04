@@ -32,6 +32,12 @@ CONTENT_SECURITY_POLICY = (
 
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
+if settings.migrate_on_startup:
+    # Prima di accettare richieste il database deve avere tutte le tabelle
+    from app.migrate import upgrade_database
+
+    upgrade_database()
+
 app = FastAPI(title="Bottega", docs_url=None, redoc_url=None, openapi_url=None)
 
 
