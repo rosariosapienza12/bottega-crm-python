@@ -44,35 +44,43 @@ Bottega is a learning project, built step by step.
 
 The interface is in Italian, since it is meant for small businesses in Italy.
 
-Still to do: an AI-generated summary of a customer's history, and a
-PostgreSQL database for real (non-demo) use.
+Still to do: an AI-generated summary of a customer's history.
 
 ## Online demo
 
-The repository includes a `Dockerfile` and a `render.yaml` blueprint for
-[Render](https://render.com)'s free plan. The online version runs in **demo
-mode** (`DEMO_MODE=true`): a "Prova la demo" button logs straight into a sample
-business, a banner says the data is fake, and everything is reset whenever the
-server restarts (the free plan has no persistent disk). After 15 minutes
-without visits the free server sleeps, so the first page can take up to a
-minute to load.
+The online version runs for free on [Vercel](https://vercel.com) with a
+[Neon](https://neon.tech) PostgreSQL database, in **demo mode**
+(`DEMO_MODE=true`): the "Prova la demo" button gives every visitor a private
+sample business, full of customers, visits, appointments, quotes and stock.
+Nobody sees anyone else's changes, and demo businesses are deleted with all
+their data after 24 hours. Demo accounts use the reserved `.invalid` domain and
+a random password nobody knows, so they can only be entered through the button.
 
-To deploy: on Render choose **New > Blueprint** and pick this repository.
-Render generates `SECRET_KEY` by itself, so no secret is ever written in the
-code.
+To deploy:
 
-Run the same image locally:
+1. Create a free project on Neon and copy its connection string (with
+   connection pooling switched off).
+2. On Vercel choose **Add New → Project**, import this repository (Vercel
+   detects the FastAPI `app` in `app/main.py`) and set these environment
+   variables:
 
-```bash
-docker build -t bottega .
-docker run -p 8000:8000 -e SECRET_KEY=<32+ random characters> \
-  -e DATABASE_URL=sqlite:///bottega.db -e DEMO_MODE=true bottega
-```
+   | Variable | Value |
+   | --- | --- |
+   | `DATABASE_URL` | the Neon connection string |
+   | `SECRET_KEY` | 32+ random characters |
+   | `DEMO_MODE` | `true` |
+   | `MIGRATE_ON_STARTUP` | `true` (the app creates and updates its tables) |
+   | `SESSION_HTTPS_ONLY` | `true` |
+   | `TRUST_FORWARDED_FOR` | `true` (Vercel puts the real client IP in `X-Forwarded-For`) |
+
+3. Deploy.
+
+The `Dockerfile` runs the same app on any server with Docker.
 
 ## Tech stack
 
 Python, FastAPI, SQLAlchemy and Alembic. SQLite in development, PostgreSQL
-planned for production. Server-rendered Jinja2 templates with HTMX for the
+(psycopg 3) online. Server-rendered Jinja2 templates with HTMX for the
 interactive parts and Tailwind CSS. Passwords hashed with Argon2. Tests with
 pytest.
 

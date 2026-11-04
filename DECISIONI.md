@@ -164,23 +164,33 @@ riquadro in cui si trova, non quella dello schermo. Così passa su due righe
 riquadro stretto "Oggi" della Panoramica su computer. Una media query avrebbe
 sistemato solo il telefono.
 
-## Demo online gratuita su Render, con Docker
-Render ha un piano gratuito senza carta di credito per le app Python. Due
-limiti: dopo 15 minuti senza visite il server si spegne (la prima pagina
-dopo ci mette fino a un minuto) e il disco si azzera a ogni riavvio. Il
-secondo limite lo usiamo a nostro favore: la versione online è una demo con
-SQLite, che a ogni avvio ricrea l'attività di prova (`DEMO_MODE=true`).
-Chi apre il link dal curriculum entra con un tocco e trova sempre dati puliti.
-Alternative scartate: Railway (solo una prova a tempo), PythonAnywhere (nel
-piano gratuito non supporta FastAPI). Per clienti veri servirà PostgreSQL
-esterno: il codice è già pronto perché passa da SQLAlchemy.
+## Demo online gratuita su Vercel, con PostgreSQL su Neon
+All'inizio avevo preparato Render, ma il server gratuito si spegne dopo 15
+minuti e la prima pagina ci metteva fino a un minuto: per un link nel
+curriculum è una brutta prima impressione. Vercel (gratis per i progetti
+personali) non si spegne e ospita anche Lumora: un solo servizio per tutti e
+due i progetti. Su Vercel il disco non resta, quindi il database è
+PostgreSQL su Neon (gratis), con il driver psycopg 3.
 
-Il Dockerfile fa girare l'app con un utente normale, non root. `render.yaml`
-fa generare a Render la SECRET_KEY: non è scritta da nessuna parte.
-`FORWARDED_ALLOW_IPS="*"` dice a uvicorn di fidarsi dell'IP scritto dal proxy:
-va bene solo perché su Render il container si raggiunge esclusivamente
-attraverso il loro proxy. Su un server esposto direttamente andrebbe messo
-l'IP del proxy.
+Con un database che resta, un unico account demo condiviso si "sporcherebbe"
+con le prove di tutti. Allora ogni clic su "Prova la demo" crea un'attività di
+prova nuova, solo per quel visitatore (app/demo.py), e quelle di più di 24 ore
+si cancellano con tutti i dati. Gli account demo hanno un indirizzo sul dominio
+riservato `.invalid` e una password casuale: non si può entrare dal login.
+Lo script `crea_demo` con la password pubblica resta solo per il PC (SQLite).
+
+Su Vercel non c'è un momento "prima dell'avvio" per lanciare le migrazioni:
+con `MIGRATE_ON_STARTUP=true` le fa l'app quando si accende. Con PostgreSQL un
+advisory lock fa aspettare le altre copie dell'app, così non si pestano i piedi.
+Le date sono in UTC: Neon usa UTC di default.
+
+`TRUST_FORWARDED_FOR=true` legge l'IP del visitatore da `X-Forwarded-For`: va
+bene solo dietro Vercel, che sovrascrive quell'header. Su un server
+raggiungibile direttamente chiunque potrebbe scriverlo e fingersi un altro IP.
+Il limite dei tentativi di login resta in memoria, quindi vale per ogni copia
+dell'app separatamente: per una demo basta.
+
+Il Dockerfile resta per chi vuole far girare l'app su un server suo.
 
 ## La SECRET_KEY viene controllata all'avvio
 Con la chiave d'esempio di `.env.example` (pubblica su GitHub) o una chiave

@@ -147,3 +147,22 @@ Cosa ho imparato:
   giusta: il problema era nell'ambiente di prova, non nell'app.
 - Copiare una libreria nel progetto ("vendoring") toglie una dipendenza
   esterna; in cambio va aggiornata a mano.
+
+Notte:
+
+- Niente Render: la demo andrà su Vercel con il database PostgreSQL su Neon,
+  come Lumora. Il CRM ora parla con PostgreSQL (psycopg 3) e le migrazioni
+  le fa l'app all'avvio.
+- La demo è diventata personale: ogni visitatore riceve il suo Salone di
+  prova, che si cancella dopo 24 ore. Provato su PostgreSQL vero: due
+  visitatori non si vedono a vicenda e la pulizia cancella tutto.
+- Tolto render.yaml. 159 test, passano anche con Python 3.12 (quello di
+  Vercel).
+
+Cosa ho imparato:
+- Un database che "resta" cambia il modo di fare una demo: con SQLite che si
+  azzera bastava un account condiviso, con PostgreSQL serve un'attività per
+  visitatore.
+- Un advisory lock di PostgreSQL è un lucchetto con un numero come nome:
+  chi arriva secondo aspetta.
+- Il dominio .invalid è riservato: nessuna email ci può arrivare.
