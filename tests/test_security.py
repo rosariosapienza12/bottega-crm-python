@@ -246,3 +246,28 @@ def test_postgres_urls_use_psycopg_driver(url):
     settings = Settings(database_url=url, secret_key="x" * 32)
 
     assert settings.database_url == "postgresql+psycopg://u:p@db.example.com/crm?sslmode=require"
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["/clienti/99999999999999999999", "/clienti/abc", "/preventivi/99999999999999999999", "/pagina-che-non-esiste"],
+)
+def test_bad_addresses_show_a_not_found_page(logged_in, path):
+    # Niente errore 500 né messaggi tecnici in JSON: una pagina vera
+    response = logged_in.get(path)
+
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("text/html")
+    assert "Pagina non trovata" in response.text
+
+
+def test_another_business_customer_shows_the_not_found_page(client):
+    register(client, "Salone Anna", "anna@example.com")
+    url = add_customer(client)
+    client.post("/esci")
+    register(client, "Palestra", "palestra@example.com")
+
+    response = client.get(url)
+
+    assert response.status_code == 404
+    assert "Cliente non trovato" in response.text

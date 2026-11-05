@@ -4,7 +4,11 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import PlainTextResponse, RedirectResponse, Response
+from sqlalchemy.exc import DataError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -88,6 +92,45 @@ app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), na
 
 for module in (auth, overview, customers, agenda, pipeline, quotes, cash, inventory):
     app.include_router(module.router)
+
+
+# --- Pagine di errore ---
+# Chi apre un indirizzo sbagliato vede una pagina vera, non un messaggio tecnico in JSON.
+# Con htmx (pezzi di pagina) si lasciano le risposte standard: htmx non le mostra.
+
+ERROR_TITLES = {404: "Pagina non trovata", 405: "Operazione non permessa"}
+
+
+def error_page(request: Request, status: int, message: str) -> Response:
+    title = ERROR_TITLES.get(status, "Qualcosa non va")
+    context = {"status": status, "title": title, "message": message}
+    return templates.TemplateResponse(request, "errore.html", context, status_code=status)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def friendly_http_error(request: Request, exc: StarletteHTTPException):
+    if request.headers.get("HX-Request") == "true" or exc.status_code < 400:
+        return await http_exception_handler(request, exc)
+    detail = exc.detail if isinstance(exc.detail, str) and exc.detail not in ("Not Found", "Method Not Allowed") else None
+    message = detail or "L'indirizzo non esiste, oppure la cosa che cerchi è stata eliminata."
+    return error_page(request, exc.status_code, message)
+
+
+@app.exception_handler(RequestValidationError)
+async def bad_id_is_not_found(request: Request, exc: RequestValidationError):
+    # Un id non numerico nell'indirizzo (/clienti/abc) è un indirizzo che non esiste
+    if any(error["loc"][:1] == ("path",) for error in exc.errors()):
+        return error_page(request, 404, "L'indirizzo non esiste.")
+    return await request_validation_exception_handler(request, exc)
+
+
+@app.exception_handler(DataError)
+@app.exception_handler(OverflowError)
+async def huge_id_is_not_found(request: Request, exc: Exception):
+    # Un numero troppo grande per il database (/clienti/99999999999999999999):
+    # PostgreSQL risponde "integer out of range", SQLite alza OverflowError.
+    # Non può esistere nessun record con quell'id, quindi è un 404, non un errore 500.
+    return error_page(request, 404, "L'indirizzo non esiste.")
 
 
 @app.exception_handler(LoginRequired)

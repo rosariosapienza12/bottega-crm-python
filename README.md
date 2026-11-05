@@ -8,9 +8,17 @@ coming, and make it easy to get back in touch.
 
 Bottega is a learning project, built step by step.
 
+**Live demo: [crm-rosario.vercel.app](https://crm-rosario.vercel.app)**. Press "Prova la demo" to get your own sample business, full of customers, visits and appointments, deleted after 24 hours.
+
 ![Overview page with income chart, today's appointments and customers to contact](docs/screenshots/overview.jpg)
 
 ![Weekly agenda with a WhatsApp reminder link on upcoming appointments](docs/screenshots/agenda.jpg)
+
+![Requests pipeline: cards dragged between columns, from new to confirmed](docs/screenshots/pipeline.jpg)
+
+On a phone: overview, agenda and a customer's page.
+
+![Bottega on a phone: overview, agenda and customer page](docs/screenshots/mobile.jpg)
 
 ## What it does
 
