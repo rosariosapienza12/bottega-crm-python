@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Bottega{% endblock %}
+
+{% block public %}
+  <div class="panel max-w-md">
+    <p class="muted text-sm">Errore {{ status }}</p>
+    <h1 class="mt-1">{{ title }}</h1>
+    <p class="mt-3 muted">{{ message }}</p>
+    <p class="mt-6 flex flex-wrap gap-3">
+      <a class="btn" href="/panoramica">Vai alla panoramica</a>
+      <a class="btn btn-ghost" href="/">Pagina iniziale</a>
+    </p>
+  </div>
+{% endblock %}

@@ -205,3 +205,12 @@ ritorno (circa 90 ms), quindi più di un secondo di attesa a ogni apertura.
 `vercel.json` sposta il codice a Francoforte (`fra1`): il piano gratuito
 permette una sola regione, e va scelta quella del database. Ho misurato anche
 Tailwind nel browser: non pesava, quindi resta così.
+
+## Pagine di errore vere
+Prima, un indirizzo sbagliato mostrava un messaggio tecnico in JSON
+(`{"detail":"Not Found"}`) e un id troppo grande per il database
+(`/clienti/99999999999999999999`) dava errore 500. Ora ogni 404 mostra una
+pagina con la grafica dell'app e un link per tornare indietro. Un id non
+numerico o fuori dai limiti del database è trattato come "non trovato":
+nessun record può avere quell'id. Con htmx le risposte restano quelle
+standard, perché htmx gli errori non li mostra.

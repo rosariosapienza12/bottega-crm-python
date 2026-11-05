@@ -184,3 +184,18 @@ Cosa ho imparato:
   query: 12 query × 90 ms = più di un secondo.
 - Prima di ottimizzare bisogna misurare: Tailwind nel browser sembrava un
   sospetto, ma non era lui il problema.
+
+## 5 novembre 2026
+
+- Pagina "Non trovato" con la grafica dell'app, al posto del JSON tecnico;
+  gli id strani o enormi nell'indirizzo danno 404 invece di 500 (provato
+  anche su PostgreSQL).
+- Richieste: le 5 colonne stanno tutte nello schermo da 1280 px in su.
+- README con il link alla demo online e immagini nuove, anche da telefono.
+- 165 test.
+
+Cosa ho imparato:
+- FastAPI permette di intercettare gli errori (exception handler) e
+  rispondere con una pagina invece del JSON.
+- Un errore 500 per un input dell'utente è quasi sempre un 404 o un 400
+  mancato: il server non deve "rompersi" per un indirizzo scritto male.

@@ -250,7 +250,8 @@ input.amount-input:invalid { border-color: var(--neg); }
 @media (max-width: 640px) { .day { grid-template-columns: 1fr; gap: 0.2rem; } }
 
 /* ---------- Pipeline ---------- */
-.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(235px, 1fr); gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
+/* 185px: le 5 colonne stanno tutte nello schermo da 1280px in su; più stretto scorre */
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(185px, 1fr); gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
 .column { background: var(--sunken); border-radius: 10px; padding: 0.7rem; min-height: 12rem; border: 2px dashed transparent; }
 .column.over { border-color: var(--violet); }
 .column header { padding: 0 0.2rem 0.6rem; }
